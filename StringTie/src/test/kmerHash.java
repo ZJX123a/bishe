@@ -237,7 +237,6 @@ public class kmerHash {
 					sg.reverse_check_and_extend(kh);
 					sg.init_parents();
 					// sg.check_again();
-
 					while (sg.if_can_extend(kh)) {
 						for (int k = 0; k < sg.node_set.size(); k++) {
 							if (sg.forward_branches.contains(sg.node_set.get(k))
@@ -250,11 +249,17 @@ public class kmerHash {
 					sg.compute_node_cov(kh);
 					int[][] edges = new int[sg.node_set.size()][sg.node_set.size()];
 					sg.compute_edge_cov(kh,edges);
+				for(int m=0;m<sg.node_set.size();m++){
+					for(int n=0;n<sg.node_set.size();n++){
+						System.out.print(edges[m][n]+"  ");
+					}
+					System.out.println();
+				}
 					float[] bv=new float[sg.node_set.size()];
 					//sg.compute_bv(kh, edges, bv);
 					flow_network fn=new flow_network();
 				//	fn.max_flow(edges, sg.node_set.size());
-					
+					sg.compute_node(0, kh,edges);
 					for (int j = 0; j < sg.node_set.size(); j++) {
 					//	System.out.println("顶点编号：" + j + "    cov:"+sg.node_set.get(j).getcov()+"     顶点序列:" + sg.node_set.get(j).getSequence());
 					//	System.out.println("父节点：" + sg.node_set.get(j).getParents());
@@ -273,7 +278,7 @@ public class kmerHash {
 			}
 		}
 		SplicingGraph sg3=new SplicingGraph();
-		sg3.compute_node("TCATCTATAAAATACTGAAAATATCATTTTAAG", kh);
+		//sg3.compute_node("TCATCTATAAAATACTGAAAATATCATTTTAAG", kh);
 		System.out.println("运行结束！");
 		System.out.println("开始构图！");
 	
