@@ -246,32 +246,39 @@ public class kmerHash {
 							}
 						}
 					}
-					sg.compute_node_cov(kh);
+				
 					int[][] edges = new int[sg.node_set.size()][sg.node_set.size()];
-					sg.compute_edge_cov(kh,edges);
-				for(int m=0;m<sg.node_set.size();m++){
-					for(int n=0;n<sg.node_set.size();n++){
-						System.out.print(edges[m][n]+"  ");
-					}
-					System.out.println();
-				}
-					float[] bv=new float[sg.node_set.size()];
-					//sg.compute_bv(kh, edges, bv);
-					flow_network fn=new flow_network();
-				//	fn.max_flow(edges, sg.node_set.size());
-					sg.compute_node(0, kh,edges);
-					for (int j = 0; j < sg.node_set.size(); j++) {
-					//	System.out.println("顶点编号：" + j + "    cov:"+sg.node_set.get(j).getcov()+"     顶点序列:" + sg.node_set.get(j).getSequence());
-					//	System.out.println("父节点：" + sg.node_set.get(j).getParents());
-						//System.out.println("子节点：" + sg.node_set.get(j).getChildren());
-					}
-//					for(int m=0;m<sg.node_set.size();m++){
-//						for(int n=0;n<sg.node_set.size();n++){
-//							System.out.print(edges[m][n]+"     ");
-//						}
-//						System.out.println();
+					sg.compute_edge_cov(edges, kh);
+					
+//				for(int m=0;m<sg.node_set.size();m++){
+//					for(int n=0;n<sg.node_set.size();n++){
+//						System.out.print(edges[m][n]+"  ");
 //					}
-					//System.out.println("运行结束！当前节点个数为：" + sg.node_set.size());
+//					System.out.println();
+//				}
+				
+					for (int j = 0; j < sg.node_set.size(); j++) {
+						System.out.println("顶点编号：" + j + "    cov:"+sg.node_set.get(j).getcov()+"     顶点序列:" + sg.node_set.get(j).getSequence());
+						System.out.println("父节点：" + sg.node_set.get(j).getParents());
+						System.out.println("子节点：" + sg.node_set.get(j).getChildren());
+					}
+					Vector<Integer> src=new Vector<Integer>();
+					Vector<Integer> des=new Vector<Integer>();
+					for(int k=0;k<sg.node_set.size();k++){
+						if(sg.node_set.get(k).getChildren().size()==0){
+							des.add(k);
+						}
+						if(sg.node_set.get(k).getParents().size()==0){
+							src.add(k);
+						}
+					}
+					for(int k=0;k<src.size();k++){
+						for(int h=0;h<des.size();h++){
+							sg.dfs(edges, src.get(k), des.get(h));
+							sg.path.clear();
+						}
+					}
+					
 					used_kmers_plus.putAll(sg.used_kmers);
 				}
 				count++;
