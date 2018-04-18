@@ -25,4 +25,9 @@ public class test {
 //		System.out.println(node.getSequence());
 		
 	}
+
+	public void max_flow() {
+		// TODO Auto-generated method stub
+		
+	}
 }

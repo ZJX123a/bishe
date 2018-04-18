@@ -17,85 +17,104 @@ public class flow_network {
 	float flow_max=0;
 	
 	
-	float bv=0.5f;
+	//float bv=0.5f;
+	Vector<Integer> path=new Vector<Integer>();
 	
-public void max_flow(int src,int des,int[][] edges,int[] node) {
-	// TODO Auto-generated method stub
-	for(int i=0;i<node_size;i++){
-		for(int j=0;j<node_size;j++){
-			System.out.print(edges[i][j]+"    ");
-		}
-		System.out.println();
-	}
-	int[][] new_edge=new int[edges.length*2][edges.length*2];
-	rewrite_graph(edges, node, new_edge);
-	for(int i=0;i<edges.length*2;i++){
-		for(int j=0;j<edges.length*2;j++){
-			System.out.print(new_edge[i][j]+"   ");
-		}
-		System.out.println();
-	}
-	//设置每条边的流量为0
-	float [][]f=new float[new_edge.length][new_edge.length];
-	for(int i=0;i<new_edge.length;i++){
-		for(int j=0;j<new_edge.length;j++){
-			if(new_edge[i][j]!=0){
-				f[i][j]=0;
+	public float max_flow(int src,int des,int[][] edges,int[] node,kmerHash kh,float[] bv,int[][]f,SplicingGraph sg) {
+		// TODO Auto-generated method stub
+		for(int i=0;i<node_size;i++){
+			for(int j=0;j<node_size;j++){
+				System.out.print(edges[i][j]+"    ");
 			}
+			System.out.println();
 		}
-	}
-	int prefix[]=new int[new_edge.length];//记录每个节点的前驱
-	while(augmenting_path(src,des, new_edge,prefix)!=-1){
-		//只要找到增广路径，就一直循环
-		int u=des;
-		float bias[]=new float[new_edge.length];
-		bias[u]=1;
-		float increament=Float.MAX_VALUE;
-		while(prefix[u]!=-1){
-			int v=prefix[u];
-			increament=Math.min(increament, new_edge[v][u]-bias[u]*f[v][u]);
-			if(prefix[v]!=-1){
-				int w=prefix[v];
-				if(v+edges.length!=u){
-					//v和u不是同一个节点   v comes before u
-					if(w+edges.length!=v){
-						//w comes brfore v
-						bias[v]=bias[u]*bv;
-					}
-					else{
-						bias[v]=bias[u];
-					}
-				}
-				else{
-					if(w+edges.length!=v){
-						//w comes before v
-						bias[v]=bias[u];
-					}
-					else{
-						bias[v]=bias[u]/bv;
-					}
-					
+		int[][] new_edge=new int[edges.length*2][edges.length*2];
+		rewrite_graph(edges, node, new_edge);
+		for(int i=0;i<edges.length*2;i++){
+			for(int j=0;j<edges.length*2;j++){
+				System.out.print(new_edge[i][j]+"   ");
+			}
+			System.out.println();
+		}
+		//设置每条边的流量为0
+		float [][]fl=new float[new_edge.length][new_edge.length];
+		for(int i=0;i<new_edge.length;i++){
+			for(int j=0;j<new_edge.length;j++){
+				if(new_edge[i][j]!=0){
+					fl[i][j]=0;
 				}
 			}
-			u=v;
 		}
-		
-		u=des;
-		while(prefix[u]!=-1){
-			int v=prefix[u];
-			//f[u][v]+=increament/bias[u];
-			new_edge[v][u]-=increament/bias[u];
-			//f[v][u]-=increament/bias[u];
-			new_edge[u][v]+=increament/bias[u];
-			u=v;
+		int prefix[]=new int[new_edge.length];//记录每个节点的前驱
+		while(augmenting_path(src,des, new_edge,prefix)!=-1){
+			//只要找到增广路径，就一直循环
+			System.out.println("path:"+path);
+			Vector<Integer> path_2=new Vector<Integer>();
+			for(int i=0;i<path.size();i++){
+				if(i%2!=1){
+					path_2.add(path.get(i));
+				}
+			}
+			System.out.println("path_2:"+path_2);
+			//SplicingGraph sg=new SplicingGraph();
+			//sg.dfs(edges, path_2.get(0), path_2.lastElement(),kh,bv,f);
+			sg.compute_fragment_count(path_2, kh,bv,f);
+			System.out.println("bv如下：");
+			for(int i=0;i<sg.node_set.size();i++){
+				System.out.print(bv[i]+"   ");
+			}
+			System.out.println();
+			int u=des;
+			float bias[]=new float[new_edge.length];
+			bias[u]=1;
+			float increament=Float.MAX_VALUE;
+			while(prefix[u]!=-1){
+				int v=prefix[u];
+				
+				increament=Math.min(increament, new_edge[v][u]-bias[u]*fl[v][u]);
+				if(prefix[v]!=-1){
+					int w=prefix[v];
+					if(v+edges.length!=u){
+						//v和u不是同一个节点   v comes before u
+						if(w+edges.length!=v){
+							//w comes brfore v
+							bias[v]=bias[u]*bv[v];
+						}
+						else{
+							bias[v]=bias[u];
+						}
+					}
+					else{
+						if(w+edges.length!=v){
+							//w comes before v
+							bias[v]=bias[u];
+						}
+						else{
+							bias[v]=bias[u]/bv[v];
+						}
+						
+					}
+				}
+				u=v;
+			}
+			
+			u=des;
+			while(prefix[u]!=-1){
+				int v=prefix[u];
+				//f[u][v]+=increament/bias[u];
+				new_edge[v][u]-=increament/bias[u];
+				//f[v][u]-=increament/bias[u];
+				new_edge[u][v]+=increament/bias[u];
+				u=v;
+			}
+			flow_max+=increament;
 		}
-		flow_max+=increament;
+		System.out.println(flow_max);
+		return flow_max;
 	}
-	System.out.println(flow_max);
-	
-}
 public float augmenting_path(int src,int des,int[][] new_edge,int[] prefix){
 	Stack<Integer> stack=new Stack<Integer>();
+	path.clear();
 	float flow[]=new float[new_edge.length];//记录到当前节点的最大流
 	for(int i=0;i<new_edge.length;i++){
 		prefix[i]=-1;//开始时设置前驱为-1
@@ -106,6 +125,7 @@ public float augmenting_path(int src,int des,int[][] new_edge,int[] prefix){
 	stack.add(src);
 	while(!stack.isEmpty()){
 		int index=stack.pop();
+		path.add(index);
 		if(index==des){
 			break;
 		}
@@ -153,7 +173,6 @@ public void rewrite_graph(int[][] edges,int[] node,int[][] new_edge){
 	int size=edges.length;
 	System.out.println(size);
 	size=2*size;
-	
 	for(int i=0;i<edges.length;i++){
 		//处理每个顶点
 		new_edge[i][i+edges.length]=node[i];
@@ -166,7 +185,7 @@ public void rewrite_graph(int[][] edges,int[] node,int[][] new_edge){
 	}
 	
 }
-
+/*
 	public static void main(String args[]){
 		int[][] edges=new int[6][6];
 		edges[0][4]=3;
@@ -191,8 +210,11 @@ public void rewrite_graph(int[][] edges,int[] node,int[][] new_edge){
 			System.out.println();
 		}
 		System.out.println("重构图！");
-		test ts=new test();
-		//ts.max_flow(0, 7, edges, node);
-		//ts.rewrite_graph(edges,node);
- }
+	//	test ts=new test();
+		int [][] new_edge=new int[edges.length*2][edges.length*2];
+		flow_network fn=new flow_network();
+		//fn.rewrite_graph(edges,node, edges);
+		fn.max_flow(0, 7, edges, node);
+		
+ }*/
 }

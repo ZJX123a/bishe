@@ -1831,33 +1831,16 @@ public class SplicingGraph {
 				}
 			}
 		}
-//		for (int i = 0; i < node_set.size(); i++) {
-//			for (int j = 0; j < node_set.size(); j++) {
-//				System.out.print(edges[i][j] + "   ");
-//			}
-//			System.out.println();
-//		}
-	}
-
-	public void compute_node_cov(int[] nodes, kmerHash kh) {
-		for (int i = 0; i < node_set.size(); i++) {
-			int length = node_set.get(i).getSequence().length();
-			int node_cov = 0;
-			for (int j = 0; j <= length - kh.kmer_length; j++) {
-				String kmer = node_set.get(i).getSequence().substring(j, j + kh.kmer_length);
-				int cov = kh.kmer_map.get(baseOptions.kmerToIntval(kmer));
-				node_cov += cov;
-			}
-			nodes[i] = node_cov;
-		}
 	}
 
 	
+	
 
-	public void compute_fragment_count(Vector<Integer> path, kmerHash kh) {
+	public void compute_fragment_count(Vector<Integer> path, kmerHash kh,float[] bv,int[][] f) {
 		int length = 0;// length代表了路径的总长度
 		Vector<Integer> terminal = new Vector<Integer>();// 记录个顶点之间的端点
 		String path_str = "";
+		//System.out.println(node_set);
 		for (int i = 0; i < path.size(); i++) {
 			length += node_set.get(path.get(i)).getSequence().length();
 			path_str += node_set.get(path.get(i)).getSequence();
@@ -1871,12 +1854,10 @@ public class SplicingGraph {
 		}
 		int start = 0;
 		int end = length - kh.kmer_length;
+		
 		System.out.println("fragment_count:"+node_set.size());
-		int[][] fragment_count = new int[node_set.size()][node_set.size()];
-		Vector<Integer> path_vec=new Vector<Integer>();
-		for(int i=0;i<path.size();i++){
-			path_vec.add(path.get(i));
-		}
+		float[][] fragment_count = new float[node_set.size()][node_set.size()];
+
 		compute_fragment(kmer_counts,start,end,path,terminal,fragment_count,kh);
 		System.out.println("fragment_count!");
 		for (int i = 0; i < node_set.size(); i++) {
@@ -1886,29 +1867,68 @@ public class SplicingGraph {
 			System.out.println();
 		}
 		System.out.println("fragment_count!结束");
+		for(int i=0;i<node_set.size();i++){
+			//最终的顶点bv
+			//减去其公共边
+			for(int j=0;j<node_set.size();j++){
+				if(fragment_count[i][j]!=0){
+					int start_p=0;
+					int end_p=0;
+					for(int k=0;k<path.size();k++){
+						if(path.get(k)==i){
+							start_p=k;
+							break;
+						}
+					}
+					for(int k=0;k<path.size();k++){
+						if(path.get(k)==j){
+							end_p=k;
+							break;
+						}
+					}
+					for(int k=start_p;k<=end_p;k++){
+						bv[path.get(k)]-=fragment_count[i][j]; //fxx
+					}
+				}
+			}
+		
+		}
+		for(int i=0;i<node_set.size();i++){
+			fragment_count[i][i]=bv[i];
+		}
+		for(int i=0;i<node_set.size();i++){
+			int fenzi=0;
+			int fenmu=0;
+			for(int j=0;j<node_set.size();j++){
+				if(fragment_count[i][j]!=0){
+					fenmu+=fragment_count[i][j];
+				}
+				if(fragment_count[j][i]!=0){
+					fenzi+=fragment_count[j][i];
+				}
+			}
+			bv[i]=(float)fenzi/fenmu;
+		}
+		
 	}
 
 	int start_biao=0;int end_biao=0;
 	public void compute_fragment(Vector<Integer> kmer_counts, int start, int end, Vector<Integer> path,
-			Vector<Integer> terminal, int[][] fragment_count,kmerHash kh) {
+			Vector<Integer> terminal, float[][] fragment_count,kmerHash kh) {
 		
 		int start_index = 0;
 		int end_index = 0;
-	//	System.out.println(terminal.size());
 		for (int i = 0; i < terminal.size(); i++) {
-			//System.out.println();
 			if (start < terminal.get(i)) {
 				// 确定从哪个顶点开始
 				start_index = i;
 				break;
 			}
+		}		
+		if(start+kh.kmer_length-1>terminal.get(start_index)){
+			return;
 		}
-//		System.out.println(start_index+"    kkkkkkk");
-		
 		if(kmer_counts.size()==1){
-//			System.out.println("start"+start);
-//			System.out.println("start_index:"+start_index);
-//			System.out.println("start_biao:"+start_biao);
 			if(start_biao+kh.kmer_length-1<terminal.get(start_index)){
 				return;
 			}
@@ -2026,10 +2046,10 @@ public class SplicingGraph {
 		
 	}
 
-	public static int compute_node_bv(int node_cov, Vector<Integer> node_kmer_count, Vector<Integer> last) {
+	public  float compute_node_bv(float node_cov, Vector<Integer> node_kmer_count) {
 		if (node_kmer_count.size() == 1) {
 			node_cov += node_kmer_count.get(0);
-			last.add(node_kmer_count.get(0));
+		//	last.add(node_kmer_count.get(0));
 			return node_cov;
 		}
 		Vector<Integer> node_kmer_count_asc = new Vector<Integer>();
@@ -2037,9 +2057,12 @@ public class SplicingGraph {
 			node_kmer_count_asc.add(node_kmer_count.get(i));
 		}
 		Collections.sort(node_kmer_count_asc);
+		if(node_kmer_count_asc.size()==0){
+			return node_cov;
+		}
 		int temp = node_kmer_count_asc.get(0);
 		node_cov += temp;
-		last.add(temp);
+	//	last.add(temp);
 		// 重置node_kmer_count
 		for (int i = 0; i < node_kmer_count.size(); i++) {
 			node_kmer_count.set(i, node_kmer_count.get(i) - temp);
@@ -2063,7 +2086,7 @@ public class SplicingGraph {
 					for (int j = 0; j < i; j++) {
 						node_kmer_c.add(node_kmer_count.get(j));
 					}
-					node_cov = compute_node_bv(node_cov, node_kmer_c, last);
+					node_cov = compute_node_bv(node_cov, node_kmer_c);
 					for (int j = 0; j <= i; j++) {
 						node_kmer_count.remove(0);
 					}
@@ -2072,7 +2095,7 @@ public class SplicingGraph {
 				}
 			}
 			if (flag == false) {
-				node_cov = compute_node_bv(node_cov, node_kmer_count, last);
+				node_cov = compute_node_bv(node_cov, node_kmer_count);
 				return node_cov;
 			}
 		}
@@ -2093,22 +2116,39 @@ public class SplicingGraph {
 
 	Stack<Integer> stack = new Stack<Integer>();
 	Vector<Integer> path = new Vector<Integer>();
-
-	public void dfs(int[][] edges, int src, int des,kmerHash kh) {
+	public void dfs(int[][] edges, int src, int des,kmerHash kh,float[] bv,int[][] f) {
 		// TODO Auto-generated method stub
+		//bv是每个顶点最开始的fragment大小，现在要减去公共边的数量
 		stack.add(src);
 		path.add(src);
 		if (src == des) {
 			System.out.println(path);
-			compute_fragment_count(path, kh);
+			compute_fragment_count(path, kh,bv,f);
 			return;
 		}
 		for (int i = 0; i < edges.length; i++) {
 			if (edges[src][i] != 0) {
-				dfs(edges, i, des,kh);
+				dfs(edges, i, des,kh,bv,f);
 				path.remove(path.size() - 1);
 			}
 		}
 	}
+	
+	public void compute_node_cov(int[] nodes, kmerHash kh,float[] bv) {
+		for (int i = 0; i < node_set.size(); i++) {
+			Vector<Integer> node_kmer_count=new Vector<Integer>();
+			int length = node_set.get(i).getSequence().length();
+			int node_cov = 0;
+			for (int j = 0; j <= length - kh.kmer_length; j++) {
+				String kmer = node_set.get(i).getSequence().substring(j, j + kh.kmer_length);
+				int cov = kh.kmer_map.get(baseOptions.kmerToIntval(kmer));
+				node_cov += cov;
+				node_kmer_count.add(cov);
+			}
+			nodes[i] = node_cov;
+			bv[i]=compute_node_bv(0, node_kmer_count);
+		}
+	}
+
 
 }
