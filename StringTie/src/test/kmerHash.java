@@ -261,11 +261,11 @@ public class kmerHash {
 						System.out.println("顶点编号：" + j + "    cov:"+sg.node_set.get(j).getcov()+"     顶点序列:" + sg.node_set.get(j).getSequence());
 						System.out.println("父节点：" + sg.node_set.get(j).getParents());
 						System.out.println("子节点：" + sg.node_set.get(j).getChildren());
-						for(int k=0;k<=sg.node_set.get(j).getSequence().length()-kh.kmer_length;k++){
-							String kmer=sg.node_set.get(j).getSequence().substring(k,k+kh.kmer_length);
-							System.out.print(kh.kmer_map.get(baseOptions.kmerToIntval(kmer))+"   ");
-						}
-						System.out.println();
+//						for(int k=0;k<=sg.node_set.get(j).getSequence().length()-kh.kmer_length;k++){
+//							String kmer=sg.node_set.get(j).getSequence().substring(k,k+kh.kmer_length);
+//							System.out.print(kh.kmer_map.get(baseOptions.kmerToIntval(kmer))+"   ");
+//						}
+//						System.out.println();
 					}
 					Vector<Integer> src=new Vector<Integer>();
 					Vector<Integer> des=new Vector<Integer>();
@@ -287,28 +287,30 @@ public class kmerHash {
 					for(int l=0;l<sg.node_set.size();l++){
 						bv_c[l]=bv[l];
 					}
-					System.out.println("每个顶点的bv为：");
-					for(int k=0;k<sg.node_set.size();k++){
-						System.out.print(bv[k]+"  ");
-					}
-					System.out.println();
+//					System.out.println("每个顶点的bv为：");
+//					for(int k=0;k<sg.node_set.size();k++){
+//						System.out.print(bv[k]+"  ");
+//					}
+				//	System.out.println();
 					flow_network fn=new flow_network();
 					float flow_sum=0;
 					for(int k=0;k<src.size();k++){
 						for(int h=0;h<des.size();h++){
-							flow_sum+=fn.max_flow(src.get(k), des.get(h), edges, nodes,kh,bv,f,sg);
+							flow_sum=fn.max_flow(src.get(k), des.get(h), edges, nodes,kh,bv,f,sg);
+							//重置bv
 							for(int l=0;l<sg.node_set.size();l++){
 								bv[l]=bv_c[l];
 							}
-							sg.path.clear();
+							//sg.path.clear();
 						}
 					}
-					System.out.println("运行之后的bv");
-					for(int k=0;k<sg.node_set.size();k++){
-						System.out.print(bv[k]+"   ");
-					}
-					System.out.println();
+//					System.out.println("运行之后的bv");
+//					for(int k=0;k<sg.node_set.size();k++){
+//						System.out.print(bv[k]+"   ");
+//					}
+			
 					System.out.println("该网络的最大流为："+flow_sum);
+					System.out.println();
 					used_kmers_plus.putAll(sg.used_kmers);
 				}
 				count++;

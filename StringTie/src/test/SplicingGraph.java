@@ -507,14 +507,14 @@ public class SplicingGraph {
 					extend_val = find_tail_kmer(kh, max_read_kmer, stop_kmer, str);
 					// System.out.println("str:" + str);
 					String extend_kmer = baseOptions.intvalToKmer(extend_val, kh.kmer_length);
-					String anchor = extend_kmer.substring(kh.kmer_length - 5);
+					String anchor = extend_kmer;
 					int start = check.indexOf(anchor);
 					if (start != -1) { // 如果找到了
-						if (is_similar(check.substring(0, start + 5), extend_kmer, 'R')) {
+						//if (is_similar(check.substring(0, start + 5), extend_kmer, 'R')) {
 							node_set.get(node_index).sequence = str.toString()
 									+ node_set.get(node_index).sequence.substring(start + 5);
 							extend_flag = true;
-						}
+					//	}
 					} else {
 						if (((int) str.length() > kh.pair_gap_length - 80) && (str.length() > extend_str.length()))
 							extend_str = str.toString();
@@ -1795,7 +1795,13 @@ public class SplicingGraph {
 								+ node_set.get(child).getSequence().substring(0, kh.kmer_length - 1);
 						for (int k = 0; k <= edge_str.length() - kh.kmer_length; k++) {
 							String kmer = edge_str.substring(k, k + kh.kmer_length);
-							int cov1 = kh.kmer_map.get(baseOptions.kmerToIntval(kmer));
+							int cov1;
+							if(kh.kmer_map.containsKey(baseOptions.kmerToIntval(kmer))){
+								cov1 = kh.kmer_map.get(baseOptions.kmerToIntval(kmer));
+							}
+							else{
+								cov1=0;
+							}
 							edges[i][child] += cov1;
 						}
 					} else if (node_set.get(i).getSequence().length() < kh.kmer_length
@@ -1804,7 +1810,13 @@ public class SplicingGraph {
 								+ node_set.get(child).getSequence().substring(0, kh.kmer_length - 1);
 						for (int k = 0; k <= edge_str.length() - kh.kmer_length; k++) {
 							String kmer = edge_str.substring(k, k + kh.kmer_length);
-							int cov1 = kh.kmer_map.get(baseOptions.kmerToIntval(kmer));
+							int cov1;
+							if(kh.kmer_map.containsKey(baseOptions.kmerToIntval(kmer))){
+								cov1 = kh.kmer_map.get(baseOptions.kmerToIntval(kmer));
+							}
+							else{
+								cov1=0;
+							}
 							edges[i][child] = cov1;
 						}
 					} else if (node_set.get(i).getSequence().length() >= kh.kmer_length
@@ -1814,7 +1826,13 @@ public class SplicingGraph {
 								+ node_set.get(child).getSequence();
 						for (int k = 0; k <= edge_str.length() - kh.kmer_length; k++) {
 							String kmer = edge_str.substring(k, k + kh.kmer_length);
-							int cov1 = kh.kmer_map.get(baseOptions.kmerToIntval(kmer));
+							int cov1;
+							if(kh.kmer_map.containsKey(baseOptions.kmerToIntval(kmer))){
+								cov1 = kh.kmer_map.get(baseOptions.kmerToIntval(kmer));
+							}
+							else{
+								cov1=0;
+							}
 							edges[i][child] = cov1;
 						}
 
@@ -1822,7 +1840,13 @@ public class SplicingGraph {
 						String edge_str = node_set.get(i).getSequence() + node_set.get(child).getSequence();
 						for (int k = 0; k <= edge_str.length() - kh.kmer_length; k++) {
 							String kmer = edge_str.substring(k, k + kh.kmer_length);
-							int cov1 = kh.kmer_map.get(baseOptions.kmerToIntval(kmer));
+							int cov1;
+							if(kh.kmer_map.containsKey(baseOptions.kmerToIntval(kmer))){
+								cov1 = kh.kmer_map.get(baseOptions.kmerToIntval(kmer));
+							}
+							else{
+								cov1=0;
+							}
 							edges[i][child] = cov1;
 						}
 
@@ -1850,7 +1874,11 @@ public class SplicingGraph {
 		Vector<Integer> kmer_counts = new Vector<Integer>();
 		for (int i = 0; i <= length - kh.kmer_length; i++) {
 			String kmer = path_str.substring(i, i + kh.kmer_length);
-			kmer_counts.add(kh.kmer_map.get(baseOptions.kmerToIntval(kmer)));
+			if(kh.kmer_map.containsKey(baseOptions.kmerToIntval(kmer))){
+			kmer_counts.add(kh.kmer_map.get(baseOptions.kmerToIntval(kmer)));}
+			else{
+				kmer_counts.add(0);
+			}
 		}
 		int start = 0;
 		int end = length - kh.kmer_length;
@@ -1959,10 +1987,13 @@ public class SplicingGraph {
 		for (int i = 0; i < kmer_counts.size(); i++) {
 			kmer_counts_asc.add(kmer_counts.get(i));
 		}
-		Collections.sort(kmer_counts_asc);
-		if(kmer_counts_asc.size()==0){
+	//	System.out.println("kmer_counts_asc:"+kmer_counts_asc);
+		if(kmer_counts_asc.size()==0||kmer_counts_asc==null){
 			return;
 		}
+		
+		Collections.sort(kmer_counts_asc);
+		
 		
 		int temp = kmer_counts_asc.get(0);// 取最小的cov
         kmer_counts.add(temp);//保证每次末尾都有0
@@ -2141,9 +2172,16 @@ public class SplicingGraph {
 			int node_cov = 0;
 			for (int j = 0; j <= length - kh.kmer_length; j++) {
 				String kmer = node_set.get(i).getSequence().substring(j, j + kh.kmer_length);
-				int cov = kh.kmer_map.get(baseOptions.kmerToIntval(kmer));
+				int cov ;
+				if(kh.kmer_map.containsKey(baseOptions.kmerToIntval(kmer))){
+					
+				cov = kh.kmer_map.get(baseOptions.kmerToIntval(kmer));
 				node_cov += cov;
-				node_kmer_count.add(cov);
+				node_kmer_count.add(cov);}
+				else{
+					node_kmer_count.add(0);
+				}
+				
 			}
 			nodes[i] = node_cov;
 			bv[i]=compute_node_bv(0, node_kmer_count);
