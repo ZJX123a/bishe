@@ -274,7 +274,9 @@ public class kmerHash {
 					}
 					for(int k=0;k<src.size();k++){
 						for(int h=0;h<des.size();h++){
-							sg.dfs(edges, src.get(k), des.get(h));
+							sg.dfs(edges, src.get(k), des.get(h),kh);
+							//System.out.println(sg.path);
+							
 							sg.path.clear();
 						}
 					}
