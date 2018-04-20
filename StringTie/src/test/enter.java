@@ -64,21 +64,22 @@ public class enter {
 					sg.forward_check_and_extend(kh, 0);
 					sg.reverse_check_and_extend(kh);
 					sg.init_parents();
-					while (sg.if_can_extend(kh)) {
-						for (int k = 0; k < sg.node_set.size(); k++) {
-							if (sg.forward_branches.contains(sg.node_set.get(k))
-									|| sg.reverse_branches.contains(sg.node_set.get(k))) {
-								sg.forward_check_and_extend(kh, k);
-								sg.reverse_check_and_extend(kh);
-							}
-						}
-					}
+//					while (sg.if_can_extend(kh)) {
+//						for (int k = 0; k < sg.node_set.size(); k++) {
+//							if (sg.forward_branches.contains(sg.node_set.get(k))
+//									|| sg.reverse_branches.contains(sg.node_set.get(k))) {
+//								sg.forward_check_and_extend(kh, k);
+//								sg.reverse_check_and_extend(kh);
+//							}
+//						}
+//					}
 
 					for (int j = 0; j < sg.node_set.size(); j++) {
-						System.out.println("顶点编号：" + j + "    cov:" + sg.node_set.get(j).getcov() + "     顶点序列:"
-								+ sg.node_set.get(j).getSequence());
-						System.out.println("父节点：" + sg.node_set.get(j).getParents());
-						System.out.println("子节点：" + sg.node_set.get(j).getChildren());
+//						System.out.println("顶点编号：" + j + "    cov:" + sg.node_set.get(j).getcov() + "     顶点序列:"
+//								+ sg.node_set.get(j).getSequence());
+//						System.out.println("父节点：" + sg.node_set.get(j).getParents());
+//						System.out.println("子节点：" + sg.node_set.get(j).getChildren());
+						p.println("顶点"+j+":"+sg.node_set.get(j).getSequence());
 					}
 					
 //			         for(int j=0;j<sg.node_set.size();j++){
@@ -117,7 +118,7 @@ public class enter {
 					}
 					// 根据read_per_base_cov找出最重的一条路径
 					List<Map.Entry<Vector<Integer>, Float>> list_path = (List) sg.find_the_highest_path(kh, path_sum);
-					System.out.println("路径与其cov:");
+					//System.out.println("路径与其cov:");
 					Map<Integer,Float> nodes_cov=new HashMap<Integer,Float>();
 					for (Map.Entry<Vector<Integer>, Float> mapping : list_path) {
 						Vector<Integer> path_highest=mapping.getKey();
@@ -125,16 +126,16 @@ public class enter {
 						int[][] edges_ter=new int[sg.node_set.size()][sg.node_set.size()];
 						String path_str = "";
 						path_str=sg.build_graph(path_highest, kh,nodes_cov,nodes,edges_ter);
-						for(int k=0;k<sg.node_set.size();k++){
-							 System.out.print(nodes[k]+" ");
-						 }
-						System.out.println();
-						for (int k = 0; k < sg.node_set.size(); k++) {
-							for (int j = 0; j < sg.node_set.size(); j++) {
-								System.out.print(edges_ter[k][j]+"   ");
-							}
-							System.out.println();
-						}
+//						for(int k=0;k<sg.node_set.size();k++){
+//							 System.out.print(nodes[k]+" ");
+//						 }
+					//	System.out.println();
+//						for (int k = 0; k < sg.node_set.size(); k++) {
+//							for (int j = 0; j < sg.node_set.size(); j++) {
+//								System.out.print(edges_ter[k][j]+"   ");
+//							}
+//							System.out.println();
+//						}
 						//设置bv
 						float[] bv=new float[sg.node_set.size()];
 						float fenzi=0;
@@ -170,10 +171,10 @@ public class enter {
 //						System.out.println();
 						flow_network fn=new flow_network();
 						float max_flow=fn.max_flow(path_highest.get(0), path_highest.lastElement(), edges_ter, nodes, kh, bv, sg);
-						p.println("转录本："+path_str);
-						p.println("其转录丰度为："+max_flow);
+//						p.println("转录本："+path_str);
+//						p.println("其转录丰度为："+max_flow);
 					}
-					System.out.println();
+				//	System.out.println();
 					used_kmers_plus.putAll(sg.used_kmers);
 				}
 				count++;

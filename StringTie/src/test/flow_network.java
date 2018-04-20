@@ -22,12 +22,12 @@ public class flow_network {
 	
 	public float max_flow(int src,int des,int[][] edges,int[] node,kmerHash kh,float[] bv,SplicingGraph sg) {
 		// TODO Auto-generated method stub
-		for(int i=0;i<node_size;i++){
-			for(int j=0;j<node_size;j++){
-				System.out.print(edges[i][j]+"    ");
-			}
-			System.out.println();
-		}
+//		for(int i=0;i<node_size;i++){
+//			for(int j=0;j<node_size;j++){
+//				System.out.print(edges[i][j]+"    ");
+//			}
+//			System.out.println();
+//		}
 		int[][] new_edge=new int[edges.length*2][edges.length*2];
 		rewrite_graph(edges, node, new_edge);
 		//设置每条边的流量为0
@@ -95,7 +95,7 @@ public class flow_network {
 			}
 			flow_max+=increament;
 		}
-		System.out.println("最大流为："+flow_max);
+		//System.out.println("最大流为："+flow_max);
 		return flow_max;
 	}
 public float augmenting_path(int src,int des,int[][] new_edge,int[] prefix){
@@ -157,7 +157,7 @@ public List sort_adjacent(Map<Integer,Integer> adjacent){
 }
 public void rewrite_graph(int[][] edges,int[] node,int[][] new_edge){
 	int size=edges.length;
-	System.out.println(size);
+	//System.out.println(size);
 	size=2*size;
 	for(int i=0;i<edges.length;i++){
 		//处理每个顶点

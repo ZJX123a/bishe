@@ -855,6 +855,15 @@ public class SplicingGraph {
 			Node node2 = new Node();
 			node1.sequence = node_set.get(node_p).sequence.substring(start);
 			node2.sequence = str.substring(0, str_length);
+			if(node2.sequence.length()==0)
+			{
+				System.out.println("2错误！");
+			}
+			if(node1.sequence.length()==0)
+			{
+				System.out.println("1错误！");
+			}
+
 			if (start == 0) { // possible if not node 0
 				int node2_index = add_node(node2);
 				node_set.get(node2_index).addChildren(node_p); // node1 is p
@@ -875,10 +884,18 @@ public class SplicingGraph {
 			if (node_p == 0 && start < 2 * kh.kmer_length) {
 				node_set.get(node_p)
 						.setSequence(str.substring(0, str_length) + node_set.get(node_p).sequence.substring(start));
+				if(node_set.get(node_p).getSequence().length()==0)
+				{
+					System.out.println("p错误！");
+				}
 				return -2;
 			}
 
 			node_set.get(node_p).setSequence(node_set.get(node_p).sequence.substring(0, start));
+			if(node_set.get(node_p).getSequence().length()==0)
+			{
+				System.out.println("p错误！");
+			}
 			int node1_index = add_node(node1);
 			for (int i = 0; i < node_set.get(node_p).children.size(); i++) {
 				node_set.get(node1_index).addChildren(node_set.get(node_p).children.get(i));
@@ -914,12 +931,13 @@ public class SplicingGraph {
 
 		String anchor_left = str.substring(0, kh.kmer_length - 1);
 		int node_q = -1;
-		while (anchor_left.length() > kh.min_anchor_length) {
+		// TODO Auto-generated method stub 可修改
+		//while (anchor_left.length() > kh.min_anchor_length) {
 			node_q = find_node_index(anchor_left);
-			if (node_q >= 0)
-				break;
-			anchor_left = anchor_left.substring(1);
-		}
+		//	if (node_q >= 0)
+		//		break;
+		//	anchor_left = anchor_left.substring(1);
+		//}
 		Set<Integer> checked = new HashSet<Integer>();
 		if (node_q < 0 || node_p == node_q || has_path(node_p, node_q, checked)) {
 			return -1;
@@ -940,6 +958,11 @@ public class SplicingGraph {
 			if (length > 0) {
 				node1.sequence = str.substring(anchor_length, length + anchor_length);
 				node1_index = add_node(node1);
+				if(node_set.get(node1_index).getSequence().length()==0)
+				{
+					System.out.println("1错误！");
+				}
+
 				reverse_branches.add(node1_index);
 				node_set.get(node_q).addChildren(node1_index);
 			} else {
@@ -952,7 +975,13 @@ public class SplicingGraph {
 			} else {
 				Node node2 = new Node();
 				node2.sequence = node_set.get(node_p).sequence.substring(start);
+				
 				int node2_index = add_node(node2);
+				if(node_set.get(node2_index).getSequence().length()==0)
+				{
+					System.out.println("2错误！");
+				}
+
 				node_set.get(node1_index).addChildren(node2_index);
 				for (int i = 0; i < node_set.get(node_p).children.size(); i++) {
 					node_set.get(node2_index).addChildren(node_set.get(node_p).children.get(i));
@@ -962,6 +991,10 @@ public class SplicingGraph {
 				node_set.get(node_p).children.clear();
 				node_set.get(node_p).addChildren(node2_index);
 				node_set.get(node_p).setSequence(node_set.get(node_p).sequence.substring(0, start));
+				if(node_set.get(node_p).getSequence().length()==0)
+				{
+					System.out.println("p错误！");
+				}
 
 			}
 
@@ -1045,14 +1078,14 @@ public class SplicingGraph {
 		int start = node_set.get(node_p).sequence.indexOf(anchor_left);
 		// 如果找不到则不断缩小anchor_left
 		if (start == -1) {
-			while (anchor_left.length() > kh.min_anchor_length) {
-				anchor_left = anchor_left.substring(0, anchor_left.length() - 1);
-				start = node_set.get(node_p).sequence.indexOf(anchor_left);
-				if (start != -1) {
-					break; // 直至找到为止
-				}
-			}
-			if (start == -1) {
+//			while (anchor_left.length() > kh.min_anchor_length) {
+//				anchor_left = anchor_left.substring(0, anchor_left.length() - 1);
+//				start = node_set.get(node_p).sequence.indexOf(anchor_left);
+//				if (start != -1) {
+//					break; // 直至找到为止
+//				}
+//			}
+			//if (start == -1) {
 				// System.out.println("node_p:"+node_set.get(node_p).getSequence());
 				// System.out.println("str:"+str);
 				// System.out.println("anchor_left:"+anchor_left);
@@ -1061,7 +1094,7 @@ public class SplicingGraph {
 				// System.out.println(node_set.get(node_p).getSequence());
 				System.out.println("无法找到起始anchor！");
 				return -6;
-			}
+		//	}
 		}
 
 		String anchor_right = str.substring(str.length() - kh.kmer_length + 1);
@@ -1140,6 +1173,10 @@ public class SplicingGraph {
 			Node node2 = new Node();
 			// System.out.println("&&&&&&&:"+node_set.get(node_p).sequence);
 			node1.sequence = node_set.get(node_p).sequence.substring(end);
+			if(node1.sequence.length()==0)
+			{
+				System.out.println("1c错误！");
+			}
 			// TODO Auto-generated method stub 可修改
 			//if(node1.sequence.length()>=15){
 			int node1_index = add_node(node1);
@@ -1152,7 +1189,10 @@ public class SplicingGraph {
 				node_set.get(node_p)
 						.setSequence(node_set.get(node_p).sequence.substring(0, start + anchor_left_length));
 				node_set.get(node_p).addChildren(node1_index);
-				// System.out.println(node_set.get(node_p).sequence);
+				if(node_set.get(node_p).getSequence().length()==0)
+				{
+					System.out.println("qc错误！");
+				}
 			} else {
 				Node node3 = new Node();
 				if (length < 0) {
@@ -1162,13 +1202,14 @@ public class SplicingGraph {
 					node3.sequence = node_set.get(node_p).sequence.substring(start + anchor_left_length,
 							start + anchor_left_length + distance);
 				}
+				if(node3.sequence.length()==0)
+				{
+					System.out.println("3c错误！");
+				}
 				int node3_index = add_node(node3);
 				node_set.get(node3_index).addChildren(node1_index);
 				node_set.get(node_p)
 						.setSequence(node_set.get(node_p).sequence.substring(0, start + anchor_left_length));
-				// node_set.get(node_p).sequence.substring(0, start +
-				// anchor_left_length);
-				// System.out.println(node_set.get(node_p).sequence);
 				node_set.get(node_p).addChildren(node3_index);
 			}
 			if (length > 0) {
@@ -1176,6 +1217,10 @@ public class SplicingGraph {
 					node2.sequence = str.substring(anchor_left_length, anchor_left_length + length - distance);
 				} else {
 					node2.sequence = str.substring(anchor_left_length, anchor_left_length + length);
+				}
+				if(node2.sequence.length()==0)
+				{
+					System.out.println("3c错误！");
 				}
 				node2_index = add_node(node2);
 				node_set.get(node2_index).addChildren(node1_index);
@@ -1206,6 +1251,9 @@ public class SplicingGraph {
 			if (start + anchor_left_length < node_set.get(node_p).sequence.length()) {
 				// 只能小于或等于 如果等于，无需再进行操作
 				node1.sequence = node_set.get(node_p).sequence.substring(start + anchor_left_length);
+				if(node1.sequence.length()==0){
+					System.out.println("1错误！");
+				}
 				node_set.get(node_p)
 						.setSequence(node_set.get(node_p).sequence.substring(0, start + anchor_left_length));
 				// node_set.get(node_p).sequence.substring(0, start +
@@ -1226,6 +1274,10 @@ public class SplicingGraph {
 			} else {
 				node2_index = node_p; // ?
 			}
+			if(node_set.get(node2_index).getSequence().length()==0)
+			{
+				System.out.println("2错误！");
+			}
 			if (end == 0) {
 				node_set.get(node2_index).addChildren(node_q);
 			} else {
@@ -1242,6 +1294,10 @@ public class SplicingGraph {
 					node_set.get(node_q).addChildren(node3_index);
 					node_set.get(node2_index).addChildren(node3_index);
 					node_set.get(node_q).sequence = node_set.get(node_q).sequence.substring(0, end);
+					if(node_set.get(node3_index).getSequence().length()==0)
+					{
+						System.out.println("3错误！");
+					}
 				}
 			}
 			// System.out.println("add_bubble之后的节点为：");
@@ -1251,7 +1307,12 @@ public class SplicingGraph {
 			// "+node_set.get(node_p).sequence);
 			// System.out.println(node1_index+" "+"node1"+"
 			// "+node_set.get(node1_index).sequence);
-
+//
+//			if(node_set.get(node1_index).getSequence().length()==0||node_set.get(node2_index).getSequence().length()==0||node_set.get(node_p).getSequence().length()==0||node_set.get(node1_index).getSequence().length()==0){
+//				System.out.println("add_bubble!错误");
+//			}
+			
+			
 			if (node2_index == node_p) {
 				return -1;
 			} else {
@@ -1336,13 +1397,13 @@ public class SplicingGraph {
 			}
 			Node node1 = new Node();
 			Node node2 = new Node();
-			if (start + kh.kmer_length < node_set.get(node_p).sequence.length()) {
+			if (start + kh.kmer_length < node_set.get(node_p).getSequence().length()) {
 				// 需要拆分
-				node1.sequence = node_set.get(node_p).sequence.substring(start + kh.kmer_length);
+				node1.sequence = node_set.get(node_p).getSequence().substring(start + kh.kmer_length);
 			}
 			node2.sequence = branch;
 			if (is_similar(branch.substring(kh.kmer_length), node1.sequence, 'F')) {
-				if (node_set.get(node_p).children.size() == 0 && node1.sequence.length() < kh.min_exon_length) {
+				if (node_set.get(node_p).getChildren().size() == 0 && node1.sequence.length() < kh.min_exon_length) {
 					return -2;
 				} else if (node1.sequence.length() + kh.kmer_length > branch.length()) {
 					return -1;
@@ -1363,8 +1424,17 @@ public class SplicingGraph {
 				node_set.get(node_p).addChildren(node1_index);
 			}
 			int node2_index = add_node(node2);
-			node_set.get(node_p).addChildren(node2_index);
+			if(node_set.get(node2_index).getSequence().length()==0)
+			{
+				System.out.println("2错误！");
+			}
+						node_set.get(node_p).addChildren(node2_index);
 			node_set.get(node_p).setSequence(node_set.get(node_p).sequence.substring(0, start + kh.kmer_length));
+			if(node_set.get(node_p).getSequence().length()==0)
+			{
+				System.out.println("p错误！");
+			}
+
 			return node2_index;
 		} else {
 			return -1;
@@ -1873,7 +1943,7 @@ public class SplicingGraph {
 		int start = 0;
 		int end = length - kh.kmer_length;
 
-		System.out.println("fragment_count:" + node_set.size());
+	//	System.out.println("fragment_count:" + node_set.size());
 		int[][] fragment_count = new int[node_set.size()][node_set.size()];
 
 		compute_fragment(kmer_counts, start, end, path, terminal, fragment_count, kh);
@@ -2183,14 +2253,17 @@ return path_str;
 				int count = 0;
 				// 子节点
 				for (int j = 0; j < node_set.get(nodes[i]).getChildren().size(); j++) {
-					System.out.println(node_set.get((int) node_set.get(nodes[i]).getChildren().get(j)).getSequence());
+					//System.out.println(node_set.get((int) node_set.get(nodes[i]).getChildren().get(j)).getSequence());
+					if(node_set.get((int) node_set.get(nodes[i]).getChildren().get(j)).getSequence().length()>=kh.kmer_length-length){
 					String kmer = node_set.get(nodes[i]).getSequence()
 							+ node_set.get((int) node_set.get(nodes[i]).getChildren().get(j)).getSequence().substring(0,
 									kh.kmer_length - length);
 					count += kh.kmer_map.get(baseOptions.kmerToIntval(kmer));
+					}
 				}
 				// 父节点
 				for (int j = 0; j < node_set.get(nodes[i]).getParents().size(); j++) {
+					if(node_set.get((int) node_set.get(nodes[i]).getParents().get(j)).getSequence().length()>=kh.kmer_length-length){
 					String kmer = node_set.get((int) node_set.get(nodes[i]).getParents().get(j)).getSequence()
 							.substring(node_set.get((int) node_set.get(nodes[i]).getParents().get(j)).getSequence()
 									.length() - (kh.kmer_length - length))
@@ -2201,6 +2274,7 @@ return path_str;
 						continue;
 					}
 					count += kh.kmer_map.get(baseOptions.kmerToIntval(kmer));
+					}
 				}
 				node_cov[nodes[i]] = count;
 				// continue;
@@ -2281,7 +2355,7 @@ return path_str;
 			}
 		}
 		// 计算edge_cov
-		System.out.println(path_highest);
+	//	System.out.println(path_highest);
 	return	compute_fragment_count(path_highest, kh,edges_ter);
 		// System.out.println();
 	}

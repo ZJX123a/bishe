@@ -17,7 +17,7 @@ public class kmerHash {
 	final float g_min_ratio_non_error = 0.5f;
 	final int pair_gap_length = 200;
 	final int max_pair_gap_length = 500;
-	final int min_anchor_length = 20;
+	final int min_anchor_length = 23;
 	final int min_function_count = 2;
 	final boolean is_paired_end = true;
 	final float min_ratio_welds = 0.04f;
