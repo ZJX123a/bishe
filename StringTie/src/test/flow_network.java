@@ -20,7 +20,7 @@ public class flow_network {
 	//float bv=0.5f;
 	Vector<Integer> path=new Vector<Integer>();
 	
-	public float max_flow(int src,int des,int[][] edges,int[] node,kmerHash kh,float[] bv,int[][]f,SplicingGraph sg) {
+	public float max_flow(int src,int des,int[][] edges,int[] node,kmerHash kh,float[] bv,SplicingGraph sg) {
 		// TODO Auto-generated method stub
 		for(int i=0;i<node_size;i++){
 			for(int j=0;j<node_size;j++){
@@ -30,12 +30,6 @@ public class flow_network {
 		}
 		int[][] new_edge=new int[edges.length*2][edges.length*2];
 		rewrite_graph(edges, node, new_edge);
-		for(int i=0;i<edges.length*2;i++){
-			for(int j=0;j<edges.length*2;j++){
-				System.out.print(new_edge[i][j]+"   ");
-			}
-			System.out.println();
-		}
 		//设置每条边的流量为0
 		float [][]fl=new float[new_edge.length][new_edge.length];
 		for(int i=0;i<new_edge.length;i++){
@@ -45,25 +39,17 @@ public class flow_network {
 				}
 			}
 		}
+		des=des+edges.length;
 		int prefix[]=new int[new_edge.length];//记录每个节点的前驱
 		while(augmenting_path(src,des, new_edge,prefix)!=-1){
 			//只要找到增广路径，就一直循环
-			System.out.println("path:"+path);
-			Vector<Integer> path_2=new Vector<Integer>();
-			for(int i=0;i<path.size();i++){
-				if(i%2!=1){
-					path_2.add(path.get(i));
-				}
-			}
-			System.out.println("path_2:"+path_2);
-			//SplicingGraph sg=new SplicingGraph();
-			//sg.dfs(edges, path_2.get(0), path_2.lastElement(),kh,bv,f);
-			sg.compute_fragment_count(path_2, kh,bv,f);
-			System.out.println("bv如下：");
-			for(int i=0;i<sg.node_set.size();i++){
-				System.out.print(bv[i]+"   ");
-			}
-			System.out.println();
+//			System.out.println("path:"+path);
+//			Vector<Integer> path_2=new Vector<Integer>();
+//			for(int i=0;i<path.size();i++){
+//				if(i%2!=1){
+//					path_2.add(path.get(i));
+//				}
+//			}
 			int u=des;
 			float bias[]=new float[new_edge.length];
 			bias[u]=1;
@@ -109,7 +95,7 @@ public class flow_network {
 			}
 			flow_max+=increament;
 		}
-		System.out.println(flow_max);
+		System.out.println("最大流为："+flow_max);
 		return flow_max;
 	}
 public float augmenting_path(int src,int des,int[][] new_edge,int[] prefix){

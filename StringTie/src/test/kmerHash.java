@@ -1,15 +1,17 @@
 package test;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.*;
 import test.baseOptions;
 import test.load_Read;
 import test.flow_network;
 
 public class kmerHash {
-	final int kmer_length = 25;
+	int kmer_length ;
 	final int min_exon_length = 20;
-	final int fr_strand = 2;
+	int fr_strand;
 	final int min_seed_cov = 2;
 	final float min_seed_entry = 1.3f;
 	final float g_min_ratio_non_error = 0.5f;
@@ -204,131 +206,12 @@ public class kmerHash {
 		});
 
 		// for (Map.Entry<Long, Long> mapping : list) {
-				// System.out.println(baseOptions.intvalToKmer(mapping.getKey(),
-				// kmer_length) + ":" + mapping.getValue()
-				// + " intval:" + mapping.getKey());
-				// }
+		// System.out.println(baseOptions.intvalToKmer(mapping.getKey(),
+		// kmer_length) + ":" + mapping.getValue()
+		// + " intval:" + mapping.getKey());
+		// }
 		return list;
 	}
 
-	public static void main(String args[]) throws IOException {
-		load_Read.load_reads();
-		kmerHash kh = new kmerHash();
-
-		kh.readsToKmer(kh.kmer_hash);
-		kh.sort_kmer(kh.kmer_hash);
-		List listK = kh.sort_kmer(kh.kmer_hash);
-		if (listK.size() == 0) {
-			System.out.println("没有数据！");
-			return;
-		} else {
-			System.out.println("有" + listK.size() + "个可用kmer");
-		}
-		int count = 0;
-		Set node_jihe = new HashSet();
-		Map<Long, Integer> used_kmers_plus = new HashMap<Long, Integer>();
-		// System.out.println("初始used_kmers:"+sg.used_kmers.size());
-		for (int i = 0; i < listK.size(); i++) {
-			if (!used_kmers_plus.containsKey(kh.list.get(i).getKey())) {
-				SplicingGraph sg = new SplicingGraph();
-				if (sg.init_trunk(kh, kh.list.get(i).getKey(), node_jihe, sg)) {
-					//System.out.println(sg.node_set.get(0).getSequence());
-					sg.forward_check_and_extend(kh, 0);
-					sg.reverse_check_and_extend(kh);
-					sg.init_parents();
-					// sg.check_again();
-					while (sg.if_can_extend(kh)) {
-						for (int k = 0; k < sg.node_set.size(); k++) {
-							if (sg.forward_branches.contains(sg.node_set.get(k))
-									|| sg.reverse_branches.contains(sg.node_set.get(k))) {
-								sg.forward_check_and_extend(kh, k);
-								sg.reverse_check_and_extend(kh);
-							}
-						}
-					}
-				
-					int[][] edges = new int[sg.node_set.size()][sg.node_set.size()];
-					sg.compute_edge_cov(edges, kh);
-					
-//				for(int m=0;m<sg.node_set.size();m++){
-//					for(int n=0;n<sg.node_set.size();n++){
-//						System.out.print(edges[m][n]+"  ");
-//					}
-//					System.out.println();
-//				}
-				
-					for (int j = 0; j < sg.node_set.size(); j++) {
-						System.out.println("顶点编号：" + j + "    cov:"+sg.node_set.get(j).getcov()+"     顶点序列:" + sg.node_set.get(j).getSequence());
-						System.out.println("父节点：" + sg.node_set.get(j).getParents());
-						System.out.println("子节点：" + sg.node_set.get(j).getChildren());
-//						for(int k=0;k<=sg.node_set.get(j).getSequence().length()-kh.kmer_length;k++){
-//							String kmer=sg.node_set.get(j).getSequence().substring(k,k+kh.kmer_length);
-//							System.out.print(kh.kmer_map.get(baseOptions.kmerToIntval(kmer))+"   ");
-//						}
-//						System.out.println();
-					}
-					Vector<Integer> src=new Vector<Integer>();
-					Vector<Integer> des=new Vector<Integer>();
-					int[][] f=new int[sg.node_set.size()][sg.node_set.size()];
-					for(int k=0;k<sg.node_set.size();k++){
-						if(sg.node_set.get(k).getChildren().size()==0){
-							des.add(k);
-						}
-						if(sg.node_set.get(k).getParents().size()==0){
-							src.add(k);
-						}
-					}
-					float[] bv=new float[sg.node_set.size()];
-					float[] bv_c=new float[sg.node_set.size()];
-					int[] nodes=new int[sg.node_set.size()];
-					//为每一个点计算其bv
-					//sg.compute_node_bv(i, des, des);
-					sg.compute_node_cov(nodes, kh, bv);
-					for(int l=0;l<sg.node_set.size();l++){
-						bv_c[l]=bv[l];
-					}
-//					System.out.println("每个顶点的bv为：");
-//					for(int k=0;k<sg.node_set.size();k++){
-//						System.out.print(bv[k]+"  ");
-//					}
-				//	System.out.println();
-					flow_network fn=new flow_network();
-					float flow_sum=0;
-					for(int k=0;k<src.size();k++){
-						for(int h=0;h<des.size();h++){
-							flow_sum=fn.max_flow(src.get(k), des.get(h), edges, nodes,kh,bv,f,sg);
-							//重置bv
-							for(int l=0;l<sg.node_set.size();l++){
-								bv[l]=bv_c[l];
-							}
-							//sg.path.clear();
-						}
-					}
-//					System.out.println("运行之后的bv");
-//					for(int k=0;k<sg.node_set.size();k++){
-//						System.out.print(bv[k]+"   ");
-//					}
-			
-					System.out.println("该网络的最大流为："+flow_sum);
-					System.out.println();
-					used_kmers_plus.putAll(sg.used_kmers);
-				}
-				count++;
-			}
-		}
-		SplicingGraph sg3=new SplicingGraph();
-		//sg3.compute_node("TCATCTATAAAATACTGAAAATATCATTTTAAG", kh);
-		System.out.println("运行结束！");
-		System.out.println("开始构图！");
 	
-		
-		//flow_network fn = new flow_network();
-//		 for (Iterator i = kh.kmer_map.keySet().iterator(); i.hasNext();) {  
-//			   Object obj = i.next();  
-//			   //System.out.print(obj+"   ");// 循环输出key  
-//			   System.out.println("key=" + obj + " value=" + kh.kmer_map.get(obj));  
-//			  }  
-//		System.out.println(baseOptions.intvalToKmer(255593747292392l, kh.kmer_length));
-
-	}
 }
