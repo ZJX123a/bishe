@@ -4,7 +4,7 @@ import java.math.*;
 
 public class baseOptions {
 	long kmer_int_val; 
-	static final int g_kmer_length=25;
+	//static final int g_kmer_length=25;
 	static char int_to_base[] = { 'A','C','G','T' };
 	//ASCIIÂë£ºA65 C67 G71 T84 a97 c99 g103 t116
 	int base_to_int[] = { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, //   0-19
@@ -149,7 +149,6 @@ public class baseOptions {
 			int c=baseToInt(kmer.charAt(i));
 			intval =intval<< 2;
 			intval |= c;
-			//System.out.println(intval);
 		}
 		
 		return intval;

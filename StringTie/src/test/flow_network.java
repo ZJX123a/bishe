@@ -1,5 +1,8 @@
 package test;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -19,18 +22,14 @@ public class flow_network {
 	
 	//float bv=0.5f;
 	Vector<Integer> path=new Vector<Integer>();
+	Vector<Integer> path_ter=new Vector<Integer>();
 	
-	public float max_flow(int src,int des,int[][] edges,int[] node,kmerHash kh,float[] bv,SplicingGraph sg) {
+	public float max_flow(int src,int des,int[][] edges,int[] node,kmerHash kh,float[] bv,SplicingGraph sg,Vector<Integer> path_highest) throws FileNotFoundException {
 		// TODO Auto-generated method stub
-//		for(int i=0;i<node_size;i++){
-//			for(int j=0;j<node_size;j++){
-//				System.out.print(edges[i][j]+"    ");
-//			}
-//			System.out.println();
-//		}
 		int[][] new_edge=new int[edges.length*2][edges.length*2];
 		rewrite_graph(edges, node, new_edge);
 		//设置每条边的流量为0
+		
 		float [][]fl=new float[new_edge.length][new_edge.length];
 		for(int i=0;i<new_edge.length;i++){
 			for(int j=0;j<new_edge.length;j++){
@@ -40,16 +39,47 @@ public class flow_network {
 			}
 		}
 		des=des+edges.length;
+		int temp=des;
 		int prefix[]=new int[new_edge.length];//记录每个节点的前驱
 		while(augmenting_path(src,des, new_edge,prefix)!=-1){
 			//只要找到增广路径，就一直循环
-//			System.out.println("path:"+path);
-//			Vector<Integer> path_2=new Vector<Integer>();
 //			for(int i=0;i<path.size();i++){
-//				if(i%2!=1){
-//					path_2.add(path.get(i));
-//				}
+//				if(i%2==0)
 //			}
+			for(int i=0;i<edges.length*2;i++){
+				if(prefix[temp]!=-1){
+//					System.out.print(temp+"->");
+//					temp=prefix[temp];
+					path.add(0, temp);
+					temp=prefix[temp];
+				}
+			}
+			temp=des;
+			path.add(0,src);
+		
+			for(int i=0;i<path.size();i++){
+				if(i%2==0){
+					path_ter.add(path.get(i));
+				}
+			}
+//			System.out.print(path_ter);
+//			System.out.println();
+			int start=0;
+			int end=0;
+			for(int i=0;i<path_highest.size();i++){
+				//寻找起点
+				if(path_highest.get(i)==path_ter.get(0)){
+					start=i;
+				}
+				//寻找终点
+				if(path_highest.get(i)==path_ter.lastElement()){
+					end=i;
+				}
+			}
+			String path_str="";
+			for(int i=start;i<=end;i++){
+				path_str+=sg.node_set.get(path_highest.get(i)).getSequence();
+			}
 			int u=des;
 			float bias[]=new float[new_edge.length];
 			bias[u]=1;
@@ -94,13 +124,16 @@ public class flow_network {
 				u=v;
 			}
 			flow_max+=increament;
+			sg.reset_kmerMap(kh, increament, path_str);
+			path.clear();
+			path_ter.clear();
 		}
-		//System.out.println("最大流为："+flow_max);
+		System.out.println("最大流为："+flow_max);
 		return flow_max;
 	}
 public float augmenting_path(int src,int des,int[][] new_edge,int[] prefix){
 	Stack<Integer> stack=new Stack<Integer>();
-	path.clear();
+	//path.clear();
 	float flow[]=new float[new_edge.length];//记录到当前节点的最大流
 	for(int i=0;i<new_edge.length;i++){
 		prefix[i]=-1;//开始时设置前驱为-1
@@ -111,7 +144,7 @@ public float augmenting_path(int src,int des,int[][] new_edge,int[] prefix){
 	stack.add(src);
 	while(!stack.isEmpty()){
 		int index=stack.pop();
-		path.add(index);
+		//path.add(index);
 		if(index==des){
 			break;
 		}
@@ -125,6 +158,7 @@ public float augmenting_path(int src,int des,int[][] new_edge,int[] prefix){
 			}
 			
 		}
+		
 		//对于可选边的权值按照从小到大排序
 		List<Map.Entry<Integer, Integer>> adjacent_list1=sort_adjacent(adjacent);
 		 for (Map.Entry<Integer, Integer> mapping : adjacent_list1) {
@@ -141,6 +175,7 @@ public float augmenting_path(int src,int des,int[][] new_edge,int[] prefix){
 		return -1;
 	}
 	else{
+	
 		return flow[des];
 	}
 }
@@ -169,6 +204,12 @@ public void rewrite_graph(int[][] edges,int[] node,int[][] new_edge){
 			}
 		}
 	}
+//	for(int i=0;i<size;i++){
+//		for(int j=0;j<size;j++){
+//			System.out.print(new_edge[i][j]+"   ");
+//		}
+//		System.out.println();
+//	}
 	
 }
 /*
