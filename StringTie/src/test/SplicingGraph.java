@@ -384,9 +384,7 @@ public class SplicingGraph {
 						max_read_kmer = intval;
 					}
 				}
-				// System.out.println("entry:"+baseOptions
-				// .computeEntropy(baseOptions.intvalToKmer(max_read_kmer,
-				// kh.kmer_length)));
+				//是取cov最大的kmer还是取最后一个kmer
 				if (max >= kh.min_seed_cov && baseOptions
 						.computeEntropy(baseOptions.intvalToKmer(max_read_kmer, kh.kmer_length)) > kh.min_seed_entry) {
 					long stop_kmer = baseOptions
@@ -413,6 +411,7 @@ public class SplicingGraph {
 						// }
 						node_set.get(node_index).setSequence(
 								node_set.get(node_index).getSequence().substring(0, start_pos + start) + str);
+					
 						extend_flag = true;
 					} else {
 						if (((int) str.length() > kh.pair_gap_length - 80) && (str.length() > extend_str.length()))
@@ -434,17 +433,11 @@ public class SplicingGraph {
 				String str = forward_extend(kmer_intval, bifurcation, kh);
 				node_set.get(node_index).setSequence(node_set.get(node_index).sequence + str.substring(kh.kmer_length));
 				// node_set.get(node_index).sequence = ;
-				if (str.length() < 2 * kh.kmer_length)
-					return;
-			} else {
-
-				// if (((int) extend_str.length() > kh.pair_gap_length - 80)
-				// && ((int) extend_str.length() < kh.max_pair_gap_length)) {
-				// node_set.get(node_index).sequence =
-				// node_set.get(node_index).sequence + extend_str;
-				// add_used_kmers(kh, extend_str);
-				// }
-
+//				if (str.length() < 2 * kh.kmer_length)
+//					return;
+				break;
+			} 
+			else {
 				return;
 			}
 		}

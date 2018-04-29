@@ -126,18 +126,16 @@ public class kmerHash {
 					int read_count = get_readset_count(kmer_hash, temp2);
 					forward_candidates.put(temp2, read_count);
 				}
-				list_forward = new ArrayList<Map.Entry<Long, Integer>>(forward_candidates.entrySet());
-
-				// 通过比较器实现比较排序
-				Collections.sort(list_forward, new Comparator<Map.Entry<Long, Integer>>() {
-					public int compare(Map.Entry<Long, Integer> o1, Map.Entry<Long, Integer> o2) {
-						return o2.getValue().compareTo(o1.getValue()); // 倒序
-					}
-				});
+				
 			}
-			// System.out.println(forward_candidates);
-			// System.out.println(list_forward);
-			// System.out.println();
+			list_forward = new ArrayList<Map.Entry<Long, Integer>>(forward_candidates.entrySet());
+
+			// 通过比较器实现比较排序
+			Collections.sort(list_forward, new Comparator<Map.Entry<Long, Integer>>() {
+				public int compare(Map.Entry<Long, Integer> o1, Map.Entry<Long, Integer> o2) {
+					return o2.getValue().compareTo(o1.getValue()); // 倒序
+				}
+			});
 			return list_forward;
 		}
 		return null;

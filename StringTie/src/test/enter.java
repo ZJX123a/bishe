@@ -74,7 +74,7 @@ public class enter {
 					// }
 					// }
 					// }
-				//	p.println("顶点个数：" + sg.node_set.size());
+					// p.println("顶点个数：" + sg.node_set.size());
 					System.out.println("顶点个数：" + sg.node_set.size());
 					// for (int j = 0; j < sg.node_set.size(); j++) {
 					// System.out.println("顶点编号：" + j + " cov:" +
@@ -101,96 +101,101 @@ public class enter {
 						p.println(">60bp id=" + count_result);
 						count_result++;
 						p.println(sg.node_set.get(0).getSequence());
-						//p.println("最大流为：" + max_flow);
+						// p.println("最大流为：" + max_flow);
 						System.out.println("最大流为：" + max_flow);
-						//continue;
-					}
-					else{
-					Vector<Integer> src = new Vector<Integer>();
-					Vector<Integer> des = new Vector<Integer>();
-					int[][] f = new int[sg.node_set.size()][sg.node_set.size()];
-					for (int k = 0; k < sg.node_set.size(); k++) {
-						if (sg.node_set.get(k).getChildren().size() == 0) {
-							des.add(k);
-						}
-						if (sg.node_set.get(k).getParents().size() == 0) {
-							src.add(k);
-						}
-					}
-
-					float flow_sum = 0;
-					int[][] edges = new int[sg.node_set.size()][sg.node_set.size()];
-					for (int k = 0; k < sg.node_set.size(); k++) {
-						for (int m = 0; m < sg.node_set.get(k).getChildren().size(); m++) {
-							int child = (int) sg.node_set.get(k).getChildren().get(m);
-							edges[k][child] = 1;
-						}
-					}
-					Vector<Vector<Integer>> path_sum = new Vector<Vector<Integer>>();
-					for (int k = 0; k < src.size(); k++) {
-						for (int h = 0; h < des.size(); h++) {
-							sg.dfs(edges, src.get(k), des.get(h), kh, f, path_sum);
-							sg.path.clear();
-						}
-					}
-					// 根据read_per_base_cov找出最重的一条路径
-					List<Map.Entry<Vector<Integer>, Float>> list_path = (List) sg.find_the_highest_path(kh, path_sum);
-					// System.out.println("路径与其cov:");
-					Map<Integer, Float> nodes_cov = new HashMap<Integer, Float>();
-					for (Map.Entry<Vector<Integer>, Float> mapping : list_path) {
-						Vector<Integer> path_highest = mapping.getKey();
-						// path_kmer_set=sg.compute_path_kmer_set(path_highest,
-						// kh);
-						int[][] edges_ter = new int[sg.node_set.size()][sg.node_set.size()];
-						String path_str = "";
-						path_str = sg.compute_fragment_count(path_highest, kh, edges_ter);
-
-						// 设置bv
-						float[] bv = new float[sg.node_set.size()];
-						float fenzi = 0;
-						float fenmu = 0;
-						int self = 0;
+						// continue;
+					} else {
+						Vector<Integer> src = new Vector<Integer>();
+						Vector<Integer> des = new Vector<Integer>();
+						int[][] f = new int[sg.node_set.size()][sg.node_set.size()];
 						for (int k = 0; k < sg.node_set.size(); k++) {
-							// 处理子节点
-							fenzi = 0;
-							fenmu = 0;
-							if (nodes[k] != 0) {
-								self = nodes[k];
-								for (int m = 0; m < sg.node_set.size(); m++) {
-									if (edges_ter[k][m] != 0) {
-										fenmu += (float) 1 / (edges_ter[k][m]);
-										self -= edges_ter[k][m];
-									}
-								}
-								// 处理父节点
-								for (int m = 0; m < sg.node_set.size(); m++) {
-									if (edges_ter[m][k] != 0) {
-										fenzi += (float) 1 / (edges_ter[m][k]);
-										self -= edges_ter[m][k];
-									}
-								}
-								bv[k] = (float) (((float) (1.0 / self) + fenzi) / ((float) (1.0 / self) + fenmu));
+							if (sg.node_set.get(k).getChildren().size() == 0) {
+								des.add(k);
+							}
+							if (sg.node_set.get(k).getParents().size() == 0) {
+								src.add(k);
 							}
 						}
 
-						System.out.println("path_highest:" + path_highest);
-						flow_network fn = new flow_network();
-
-						max_flow = fn.max_flow(path_highest.get(0), path_highest.lastElement(), edges_ter, node_cov, kh,
-								bv, sg, path_highest);
-						if (max_flow > 0) {
-							p.println(">60bp id=" + count_result);
-							count_result++;
-							p.println(path_str);
-							//p.println("最大流为：" + max_flow);
+						float flow_sum = 0;
+						int[][] edges = new int[sg.node_set.size()][sg.node_set.size()];
+						for (int k = 0; k < sg.node_set.size(); k++) {
+							for (int m = 0; m < sg.node_set.get(k).getChildren().size(); m++) {
+								int child = (int) sg.node_set.get(k).getChildren().get(m);
+								edges[k][child] = 1;
+							}
 						}
-						if (sg.node_set.size() == 1) {
-							System.out.println();
+						Vector<Vector<Integer>> path_sum = new Vector<Vector<Integer>>();
+						for (int k = 0; k < src.size(); k++) {
+							for (int h = 0; h < des.size(); h++) {
+								sg.dfs(edges, src.get(k), des.get(h), kh, f, path_sum);
+								sg.path.clear();
+							}
 						}
+		//				System.out.println("路径条数："+path_sum.size());
+		//				for (int q = 0; q < path_sum.size(); q++) {
+							// 根据read_per_base_cov找出最重的一条路径
+							List<Map.Entry<Vector<Integer>, Float>> list_path = (List) sg.find_the_highest_path(kh,
+									path_sum);
+							// System.out.println("路径与其cov:");
+							Map<Integer, Float> nodes_cov = new HashMap<Integer, Float>();
+							Vector<Integer> path_highest=new Vector<Integer>();
+							//每次找到权重最大的路径
+							for (Map.Entry<Vector<Integer>, Float> mapping : list_path) {
+								 path_highest = mapping.getKey();
+								//break;
+							
+								int[][] edges_ter = new int[sg.node_set.size()][sg.node_set.size()];
+								String path_str = "";
+								path_str = sg.compute_fragment_count(path_highest, kh, edges_ter);
 
+								// 设置bv
+								float[] bv = new float[sg.node_set.size()];
+								float fenzi = 0;
+								float fenmu = 0;
+								int self = 0;
+								for (int k = 0; k < sg.node_set.size(); k++) {
+									// 处理子节点
+									fenzi = 0;
+									fenmu = 0;
+									if (nodes[k] != 0) {
+										self = nodes[k];
+										for (int m = 0; m < sg.node_set.size(); m++) {
+											if (edges_ter[k][m] != 0) {
+												fenmu += (float) 1 / (edges_ter[k][m]);
+												self -= edges_ter[k][m];
+											}
+										}
+										// 处理父节点
+										for (int m = 0; m < sg.node_set.size(); m++) {
+											if (edges_ter[m][k] != 0) {
+												fenzi += (float) 1 / (edges_ter[m][k]);
+												self -= edges_ter[m][k];
+											}
+										}
+										bv[k] = (float) (((float) (1.0 / self) + fenzi)
+												/ ((float) (1.0 / self) + fenmu));
+									}
+								}
+
+								System.out.println("path_highest:" + path_highest);
+								flow_network fn = new flow_network();
+
+								max_flow = fn.max_flow(path_highest.get(0), path_highest.lastElement(), edges_ter,
+										node_cov, kh, bv, sg, path_highest);
+								if (max_flow > 0) {
+									p.println(">60bp id=" + count_result);
+									count_result++;
+									p.println(path_str);
+									// p.println("最大流为：" + max_flow);
+								}
+								if (sg.node_set.size() == 1) {
+									System.out.println();
+								}
+
+							}
+		//				}
 					}
-					}
-					// System.out.println();
 					used_kmers_plus.putAll(sg.used_kmers);
 				}
 				count++;
