@@ -10,6 +10,10 @@ import java.util.Vector;
 
 public class load_Read {
 	public static Vector<String> read_vector=new Vector<String>();
+	/**
+	 * 从输入文件中解析出reads信息，并将reads信息保存在read_vector中
+	 * @throws IOException
+	 */
 	   public static  void load_reads() throws IOException{
 		   File file=new File("sim130bp.fa");
 		   BufferedReader reader=null;

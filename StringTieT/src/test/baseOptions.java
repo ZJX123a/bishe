@@ -1,42 +1,55 @@
 package test;
+
 import java.util.*;
 import java.math.*;
 
 public class baseOptions {
-	long kmer_int_val; 
-	//static final int g_kmer_length=25;
-	static char int_to_base[] = { 'A','C','G','T' };
-	//ASCII码：A65 C67 G71 T84 a97 c99 g103 t116
-	int base_to_int[] = { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, //   0-19
-	255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, //  20-39
-	255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, //  40-59
-	255, 255, 255, 255, 255,   0, 255,   1, 255, 255, 255,  2 , 255, 255, 255, 255, 255, 255, 255, 255, //  60-79
-	255, 255, 255, 255,   3, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,   0, 255,   1, //  80-99
-	255, 255, 255,   2, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,   3, 255, 255, 255, // 100-119
-	255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, // 120-139
-	255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, // 140-159
-	255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, // 160-179
-	255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, // 180-209
-	255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, // 200-219
-	255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, // 220-239
-	255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255                      // 240-255
+	long kmer_int_val;
+	// static final int g_kmer_length=25;
+	static char int_to_base[] = { 'A', 'C', 'G', 'T' };
+	// ASCII码：A65 C67 G71 T84 a97 c99 g103 t116
+	int base_to_int[] = { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+			255, // 0-19
+			255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, // 20-39
+			255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, // 40-59
+			255, 255, 255, 255, 255, 0, 255, 1, 255, 255, 255, 2, 255, 255, 255, 255, 255, 255, 255, 255, // 60-79
+			255, 255, 255, 255, 3, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 255, 1, // 80-99
+			255, 255, 255, 2, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 3, 255, 255, 255, // 100-119
+			255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, // 120-139
+			255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, // 140-159
+			255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, // 160-179
+			255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, // 180-209
+			255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, // 200-219
+			255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, // 220-239
+			255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 // 240-255
 	};
 
+	/**
+	 * 判断k-mer中是否含有不是ACGT的字符
+	 * 
+	 * @param kmer
+	 * @return
+	 */
 	boolean containNotAGCT(String kmer) {
-		for (int i = 0;i < kmer.length();i++) {
+		for (int i = 0; i < kmer.length(); i++) {
 			if (base_to_int[kmer.charAt(i)] > 3) {
 				return true;
-		    }
+			}
 		}
 		return false;
 	}
 
+	/**
+	 * 求k-mer的反向互补字符串
+	 * 
+	 * @param kmer
+	 * @return
+	 */
 	String revcomp(String kmer) {
-		String reverseString="";
-		for (int i = kmer.length() - 1;i >= 0;i--) {
+		String reverseString = "";
+		for (int i = kmer.length() - 1; i >= 0; i--) {
 			char tempc = kmer.charAt(i);
-			switch (tempc)
-			{
+			switch (tempc) {
 			case 'A':
 				reverseString += 'T';
 				break;
@@ -68,42 +81,59 @@ public class baseOptions {
 		return reverseString;
 	}
 
+	/**
+	 * 根据输入的int c，可得到相应的字符，即可将0、1、2、3转换为相应的A、C、G、T。
+	 * 
+	 * @param c
+	 * @return
+	 */
 	static char intToBase(int c) {
-		if (c < 0 || c>3) {
+		if (c < 0 || c > 3) {
 			System.out.println("[警告！] int_val不在0-3内！");
-			//exit(1);
+			// exit(1);
 			return 'Z';
 		}
-		//cout << int_to_base[int_val] << endl;
+		// cout << int_to_base[int_val] << endl;
 		return int_to_base[c];
 	}
 
+	/**
+	 * 根据输入的base_val，判断其对应的数字，并将该数字返回。
+	 * 
+	 * @param base_val
+	 * @return
+	 */
 	static int baseToInt(char base_val) {
 		switch (base_val) {
 		case 'G':
 		case 'g':
-			return(2);
+			return (2);
 		case 'A':
 		case 'a':
-			return(0);
+			return (0);
 		case 'T':
 		case 't':
-			return(3);
+			return (3);
 		case 'C':
 		case 'c':
-			return(1);
+			return (1);
 		default:
-			return(-1);
+			return (-1);
 		}
 	}
 
-	
-
-	public static String intvalToKmer(long int_val,int kmer_length) {
+	/**
+	 * 将二进制的k-mer值（int_val）用位移的方法转化为String形式。
+	 * 
+	 * @param int_val
+	 * @param kmer_length
+	 * @return
+	 */
+	public static String intvalToKmer(long int_val, int kmer_length) {
 		String kmer = "";
 		int c;
 		char base;
-		for (int i = kmer_length-1;i >=0;i--) {
+		for (int i = kmer_length - 1; i >= 0; i--) {
 			c = (int) (int_val & 3);
 			base = intToBase(c);
 			kmer = base + kmer;
@@ -112,30 +142,33 @@ public class baseOptions {
 		return kmer;
 	}
 
+	/**
+	 * 计算字符串的熵
+	 * 
+	 * @param kmer
+	 * @return
+	 */
 	public static float computeEntropy(String kmer) {
 		int length = kmer.length();
-		int a[] =new int[4];
+		int a[] = new int[4];
 		float entropy = 0;
-		for (int i = 0;i < length;i++) {
-			if(kmer.charAt(i)=='A'){
+		for (int i = 0; i < length; i++) {
+			if (kmer.charAt(i) == 'A') {
 				a[0]++;
-			}
-			else if(kmer.charAt(i)=='C'){
+			} else if (kmer.charAt(i) == 'C') {
 				a[1]++;
-			}
-			else if(kmer.charAt(i)=='G'){
+			} else if (kmer.charAt(i) == 'G') {
 				a[2]++;
-			}
-			else if(kmer.charAt(i)=='T'){
+			} else if (kmer.charAt(i) == 'T') {
 				a[3]++;
 			}
 		}
-		char base[] = { 'A','C','G','T' };
+		char base[] = { 'A', 'C', 'G', 'T' };
 		int countl;
 		double result;
-		for (int i = 0;i < 4;i++) {
-			countl=a[i];
-			result = (float)countl / kmer.length();
+		for (int i = 0; i < 4; i++) {
+			countl = a[i];
+			result = (float) countl / kmer.length();
 			if (result > 0) {
 				entropy += result * Math.log(1.0 / result) / Math.log(2.f);
 			}
@@ -143,16 +176,22 @@ public class baseOptions {
 		return entropy;
 	}
 
+	/**
+	 * 将输入的k-mer利用位移和或操作转化为二进制long值
+	 * 
+	 * @param kmer
+	 * @return
+	 */
 	public static long kmerToIntval(String kmer) {
-		long  intval = 0;
-		for (int i = 0;i < kmer.length();i++) {
-			int c=baseToInt(kmer.charAt(i));
-			intval =intval<< 2;
+		long intval = 0;
+		for (int i = 0; i < kmer.length(); i++) {
+			int c = baseToInt(kmer.charAt(i));
+			intval = intval << 2;
 			intval |= c;
 		}
-		
+
 		return intval;
-		//return 0;
+		// return 0;
 	}
 
 }

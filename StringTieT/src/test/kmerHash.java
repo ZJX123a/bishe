@@ -9,7 +9,7 @@ import test.load_Read;
 import test.flow_network;
 
 public class kmerHash {
-	int kmer_length ;
+	int kmer_length;
 	final int min_exon_length = 20;
 	int fr_strand;
 	final int min_seed_cov = 2;
@@ -27,12 +27,22 @@ public class kmerHash {
 	Map<Long, Integer> kmer_map = new HashMap<Long, Integer>();
 	List<Map.Entry<Long, Integer>> list;
 
-	public void readsToKmer(Map<Long, Vector<Integer>> kmer_hash,Vector<String> read_vector) {
+	/**
+	 * 利用解析好的reads数据构建k-mer字典
+	 * 对于每一个read，按照k-mer大小截取所有k-mer，并统计目前k-mer出现的reads的标号，将k-
+	 * mer和所覆盖的标号一同存入kmer_hash
+	 * 
+	 * @param kmer_hash
+	 *            将构建好的k-mer字典的结果保存在kmer_hash中
+	 * @param read_vector
+	 *            输入
+	 */
+	public void readsToKmer(Map<Long, Vector<Integer>> kmer_hash, Vector<String> read_vector) {
 		// TODO Auto-generated method stub
 		String temp_kmer;
 		long intval = 0;
 		for (int i = 0; i < read_vector.size(); i++) {
-			String read =read_vector.get(i);
+			String read = read_vector.get(i);
 			for (int j = 0; j < read.length() - kmer_length + 1; j++) {
 				temp_kmer = read.substring(j, j + kmer_length);
 				intval = baseOptions.kmerToIntval(temp_kmer);
@@ -49,10 +59,25 @@ public class kmerHash {
 		}
 	}
 
+	/**
+	 * 得到某一k-mer覆盖的所有reads的标号的集合
+	 * 
+	 * @param intval
+	 *            k-mer的long型值
+	 * @param kmer_hash
+	 * @return 返回Vector，Vector中含有k-mer覆盖的所有reads标号
+	 */
 	public Vector<Integer> get_readset(long intval, Map<Long, Vector<Integer>> kmer_hash) {
 		return (Vector<Integer>) kmer_hash.get(intval);
 	}
 
+	/**
+	 * 判断某一k-mer在kmer_hash中是否存在
+	 * 
+	 * @param kmer_hash
+	 * @param intval
+	 * @return 如果存在返回true，否则返回false
+	 */
 	private boolean ifexist(Map<Long, Vector<Integer>> kmer_hash, long intval) {
 		if (kmer_hash.containsKey(intval)) {
 			return true;
@@ -61,6 +86,13 @@ public class kmerHash {
 		}
 	}
 
+	/**
+	 * 得到k-mer覆盖的reads数目
+	 * 
+	 * @param kmer_hash
+	 * @param intval
+	 * @return
+	 */
 	public int get_readset_count(Map<Long, Vector<Integer>> kmer_hash, long intval) {
 		if (ifexist(kmer_hash, intval)) {
 			Vector readset = (Vector) kmer_hash.get(intval);
@@ -71,6 +103,11 @@ public class kmerHash {
 		}
 	}
 
+	/**
+	 * 刪除一些不符合要求的k-mer
+	 * 
+	 * @param kmer_hash
+	 */
 	private void delete_bad_kmers(Map<Long, Vector<Integer>> kmer_hash) {
 		Vector delete_list = new Vector();
 		for (Iterator<Long> iterator = kmer_hash.keySet().iterator(); iterator.hasNext();) {
@@ -112,6 +149,15 @@ public class kmerHash {
 		}
 	}
 
+	/**
+	 * 得到正向的candidates，用于后续的正向延申 利用种子k-mer（seed_kmer）通过位移得到forward_candidates，
+	 * 并根据每个forward_candidate的reads覆盖度进行排序，将排序的结果存放在list中
+	 *
+	 * @param seed_kmer
+	 *            种子k-mer
+	 * @param kmer_hash
+	 * @return 返回排好序的list
+	 */
 	public List get_forward_candidates(long seed_kmer, Map<Long, Vector<Integer>> kmer_hash) {
 		if (ifexist(kmer_hash, seed_kmer)) {
 			Map forward_candidates = new HashMap();
@@ -126,7 +172,7 @@ public class kmerHash {
 					int read_count = get_readset_count(kmer_hash, temp2);
 					forward_candidates.put(temp2, read_count);
 				}
-				
+
 			}
 			list_forward = new ArrayList<Map.Entry<Long, Integer>>(forward_candidates.entrySet());
 
@@ -142,6 +188,15 @@ public class kmerHash {
 
 	}
 
+	/**
+	 * 得到反向的candidates，用于后续的反向延伸， 利用种子k-mer（seed_kmer）通过位移得到reverse_candidates，
+	 * 并根据每个reverse_candidate的reads覆盖度进行排序，将排序的结果存放在list中
+	 *
+	 * @param seed_kmer
+	 *            种子k-mer
+	 * @param kmer_hash
+	 * @return 返回排好序的list
+	 */
 	public List get_reverse_candidates(long seed_kmer, Map<Long, Vector<Integer>> kmer_hash) {
 		if (ifexist(kmer_hash, seed_kmer)) {
 			Map reverse_candidates = new HashMap();
@@ -176,6 +231,11 @@ public class kmerHash {
 
 	}
 
+	/**
+	 * 打印k-mer字典
+	 * 
+	 * @param kmer_hash
+	 */
 	private void print_kmerhash(Map<Long, Vector<Integer>> kmer_hash) {
 		System.out.println(kmer_hash.size());
 		for (Iterator<Long> iterator = kmer_hash.keySet().iterator(); iterator.hasNext();) {
@@ -185,8 +245,13 @@ public class kmerHash {
 		}
 	}
 
+	/**
+	 * 对于k-mer字典中的所有k-mer，按照其reads覆盖度进行排序
+	 * 
+	 * @param kmer_hash
+	 * @return 将排序的结果放入list中，返回list
+	 */
 	public List sort_kmer(Map<Long, Vector<Integer>> kmer_hash) {
-
 		Long key;
 		int count;
 		for (Iterator<Long> iterator = kmer_hash.keySet().iterator(); iterator.hasNext();) {
@@ -210,5 +275,4 @@ public class kmerHash {
 		return list;
 	}
 
-	
 }

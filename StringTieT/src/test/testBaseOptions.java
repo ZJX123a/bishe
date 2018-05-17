@@ -6,6 +6,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class testBaseOptions {
+	/**
+	 * 对baseOptions类中的基本操作进行测试
+	 */
 	baseOptions bo=new baseOptions();
 	@Before
 	public void setUp() throws Exception {

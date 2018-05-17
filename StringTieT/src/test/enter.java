@@ -13,6 +13,11 @@ import java.util.Set;
 import java.util.Vector;
 
 public class enter {
+	/**
+	 * 输入运行程序所需参数
+	 * 
+	 * @param kh
+	 */
 	public static void print_message(kmerHash kh) {
 		System.out.println("基于流分解的转录组组装程序开始运行..........");
 		System.out.println("请输入相关参数..........");
@@ -34,6 +39,12 @@ public class enter {
 		kh.fr_strand = read;
 	}
 
+	/**
+	 * main函数
+	 * 
+	 * @param args
+	 * @throws IOException
+	 */
 	public static void main(String args[]) throws IOException {
 		kmerHash kh = new kmerHash();
 
@@ -43,7 +54,7 @@ public class enter {
 		System.out.println("开始构造kmerHash！");
 		long startTime = System.currentTimeMillis(); // 获取开始时间
 		load_Read.load_reads();
-		kh.readsToKmer(kh.kmer_hash,load_Read.read_vector);
+		kh.readsToKmer(kh.kmer_hash, load_Read.read_vector);
 		kh.sort_kmer(kh.kmer_hash);
 		long endTime = System.currentTimeMillis(); // 获取开始时间
 		System.out.println("kmerHash构造完成！运行时间为：" + (endTime - startTime) + "ms.");
@@ -156,18 +167,18 @@ public class enter {
 							int[][] edges_ter = new int[sg.node_set.size()][sg.node_set.size()];
 							String path_str = "";
 							path_str = sg.compute_fragment_count(path_highest, kh, edges_ter);
-							//如果path_str中有不存在的kmer 放弃处理该路径
-							boolean flag=false;
-							for(int k=0;k<=path_str.length()-kh.kmer_length;k++){
-								String kmer=path_str.substring(k,k+kh.kmer_length);
-								long intval=baseOptions.kmerToIntval(kmer);
-								if(!kh.kmer_map.containsKey(intval)){
+							// 如果path_str中有不存在的kmer 放弃处理该路径
+							boolean flag = false;
+							for (int k = 0; k <= path_str.length() - kh.kmer_length; k++) {
+								String kmer = path_str.substring(k, k + kh.kmer_length);
+								long intval = baseOptions.kmerToIntval(kmer);
+								if (!kh.kmer_map.containsKey(intval)) {
 									System.out.println("包含不合法kmer！");
-									flag=true;
+									flag = true;
 									break;
 								}
 							}
-							if(flag){
+							if (flag) {
 								continue;
 							}
 							// 设置bv

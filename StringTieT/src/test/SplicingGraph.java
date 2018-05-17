@@ -22,12 +22,24 @@ public class SplicingGraph {
 	Set<Integer> reverse_branches = new HashSet<Integer>();
 	Map<Long, Integer> used_kmers = new HashMap<Long, Integer>();
 
+	/**
+	 * 自定义Node类，用于保存节点信息
+	 * 
+	 * @author 他来时翻山越岭
+	 *
+	 */
 	public class Node {
 		private Vector<Integer> parents = new Vector<Integer>();
 		private Vector<Integer> children = new Vector<Integer>();
 		private String sequence;
 		private int cov;
 
+		/**
+		 * 在该顶点的父节点集合parents中加入父节点parent。
+		 * 
+		 * @param parent
+		 * @return
+		 */
 		public boolean addParents(int parent) {
 			if (parent < 0) {
 				return false;
@@ -43,17 +55,28 @@ public class SplicingGraph {
 			}
 		}
 
+		/**
+		 * 返回该顶点的父节点集合。
+		 * 
+		 * @return
+		 */
 		public List getParents() {
 			return parents;
 		}
 
+		/**
+		 * 在该顶点的子节点集合children中加入节点child，使child成为该顶点的子节点。
+		 * 
+		 * @param child
+		 * @return
+		 */
 		public boolean addChildren(int child) {
 			if (child < 0) {
 				return false;
 			} else {
 				if (children.size() != 0) {
 					for (int i = 0; i < children.size(); ++i) {
-						if (children.get(i) == child) 
+						if (children.get(i) == child)
 							return false;
 					}
 				}
@@ -62,18 +85,39 @@ public class SplicingGraph {
 			}
 		}
 
+		/**
+		 * 返回该顶点的子节点集合。
+		 * 
+		 * @return
+		 */
 		public Vector getChildren() {
 			return children;
 		}
 
+		/**
+		 * 设置seq为当前顶点序列。
+		 * 
+		 * @param seq
+		 */
 		public void setSequence(String seq) {
 			sequence = seq;
 		}
 
+		/**
+		 * 返回当前顶点序列。
+		 * 
+		 * @return
+		 */
 		public String getSequence() {
 			return sequence;
 		}
 
+		/**
+		 * 判断child是不是该节点的一个子节点。
+		 * 
+		 * @param child
+		 * @return
+		 */
 		public boolean isChild(int child) {
 			if (child < 0) {
 				return false;
@@ -87,6 +131,12 @@ public class SplicingGraph {
 			}
 		}
 
+		/**
+		 * 判断parent是否为该顶点的一个父节点。
+		 * 
+		 * @param parent
+		 * @return
+		 */
 		public boolean isParent(int parent) {
 			if (parent < 0) {
 				return false;
@@ -100,8 +150,14 @@ public class SplicingGraph {
 			}
 		}
 
+		/**
+		 * 删除该节点的子节点child。
+		 * 
+		 * @param child
+		 * @return
+		 */
 		public boolean deleteChild(int child) {
-		if (child < 0) {
+			if (child < 0) {
 				return false;
 			} else {
 				for (int i = 0; i < children.size(); i++) {
@@ -114,6 +170,12 @@ public class SplicingGraph {
 			}
 		}
 
+		/**
+		 * 删除该节点的父节点parent。
+		 * 
+		 * @param parent
+		 * @return
+		 */
 		public boolean deleteParent(int parent) {
 			// TODO Auto-generated method stub
 			if (parent < 0) {
@@ -129,14 +191,23 @@ public class SplicingGraph {
 			}
 		}
 
+		/**
+		 * 将子节点集合清空。
+		 */
 		public void clearChildren() {
 			children.clear();
 		}
 
+		/**
+		 * 将父节点集合清空。
+		 */
 		public void clearParents() {
 			parents.clear();
 		}
 
+		/**
+		 * 将父子节点集合都清空
+		 */
 		public void clearAll() {
 			// TODO Auto-generated method stub
 			children.clear();
@@ -144,16 +215,36 @@ public class SplicingGraph {
 			sequence = "";
 		}
 
+		/**
+		 * 设置当前定点的coverage
+		 * 
+		 * @param cove
+		 */
 		public void setcov(int cove) {
 			cov = cove;
 		}
 
+		/**
+		 * 获取当前顶点的coverage
+		 * 
+		 * @return
+		 */
 		public int getcov() {
 			// TODO Auto-generated method stub
 			return cov;
 		}
 	}
 
+	/**
+	 * 从种子k-mer开始进行正向延伸，直至不能再进行延伸为止
+	 * 
+	 * @param kmer_int
+	 *            种子k-mer
+	 * @param bifurcation
+	 *            保存延伸过程中的分叉点
+	 * @param kh
+	 * @return
+	 */
 	private String forward_extend(long kmer_int, Vector<Long> bifurcation, kmerHash kh) {
 		List<Map.Entry<Long, Integer>> candidates = new ArrayList<Map.Entry<Long, Integer>>();
 
@@ -204,6 +295,16 @@ public class SplicingGraph {
 		return kmer_string;
 	}
 
+	/**
+	 * 从种子k-mer开始进行反向延伸，直至不能再进行延伸为止
+	 * 
+	 * @param kmer_int
+	 *            种子k-mer
+	 * @param bifurcation
+	 *            保存延伸过程中的分叉点
+	 * @param kh
+	 * @return
+	 */
 	// 反向扩展
 	private String reverse_extend(long kmer_int, Vector<Long> bifurcation, kmerHash kh) {
 		List<Map.Entry<Long, Integer>> candidates = new ArrayList<Map.Entry<Long, Integer>>();
@@ -254,6 +355,12 @@ public class SplicingGraph {
 		return kmer_string;
 	}
 
+	/**
+	 * 用于判断某个k-mer是否被使用过
+	 * 
+	 * @param candidate
+	 * @return
+	 */
 	public boolean has_been_used(Long candidate) {
 		if (used_kmers.containsKey(candidate)) {
 			return true;
@@ -262,6 +369,12 @@ public class SplicingGraph {
 		}
 	}
 
+	/**
+	 * 正向构图和反向构图之后再次进行扩展延伸
+	 * 
+	 * @param kh
+	 * @param bifurcation
+	 */
 	public void extend_again(kmerHash kh, Vector<Long> bifurcation) {
 		List<Map.Entry<Long, Long>> candidates = new ArrayList<Map.Entry<Long, Long>>();
 		if (node_set.get(0).sequence.length() > 2 * kh.kmer_length + kh.kmer_length) {
@@ -323,6 +436,12 @@ public class SplicingGraph {
 		}
 	}
 
+	/**
+	 * 在目前的node集合中加入顶点node
+	 * 
+	 * @param node
+	 * @return
+	 */
 	public int add_node(Node node) {
 		node_set.add(node);
 		// System.out.println("节点个数：" + node_set.get(0));
@@ -330,6 +449,17 @@ public class SplicingGraph {
 
 	}
 
+	/**
+	 * 由于我们的数据是paired——end reads，因此我们需要利用paired-end reads对树干进行正向延伸
+	 * 
+	 * @param kh
+	 * @param data
+	 *            paired-end reads信息
+	 * @param node_index
+	 *            要处理的顶点标号
+	 * @param bifurcation
+	 *            分叉点
+	 */
 	public void forward_extend_use_pairInfo(kmerHash kh, Vector<String> data, int node_index,
 			Vector<Long> bifurcation) {
 		// 利用paired_end_reads进行扩展 node_index为顶点标号
@@ -382,7 +512,7 @@ public class SplicingGraph {
 						max_read_kmer = intval;
 					}
 				}
-				//是取cov最大的kmer还是取最后一个kmer
+				// 是取cov最大的kmer还是取最后一个kmer
 				if (max >= kh.min_seed_cov && baseOptions
 						.computeEntropy(baseOptions.intvalToKmer(max_read_kmer, kh.kmer_length)) > kh.min_seed_entry) {
 					long stop_kmer = baseOptions
@@ -409,7 +539,7 @@ public class SplicingGraph {
 						// }
 						node_set.get(node_index).setSequence(
 								node_set.get(node_index).getSequence().substring(0, start_pos + start) + str);
-					
+
 						extend_flag = true;
 					} else {
 						if (((int) str.length() > kh.pair_gap_length - 80) && (str.length() > extend_str.length()))
@@ -431,16 +561,26 @@ public class SplicingGraph {
 				String str = forward_extend(kmer_intval, bifurcation, kh);
 				node_set.get(node_index).setSequence(node_set.get(node_index).sequence + str.substring(kh.kmer_length));
 				// node_set.get(node_index).sequence = ;
-//				if (str.length() < 2 * kh.kmer_length)
-//					return;
+				// if (str.length() < 2 * kh.kmer_length)
+				// return;
 				break;
-			} 
-			else {
+			} else {
 				return;
 			}
 		}
 	}
 
+	/**
+	 * 因利用paired-end reads对树干进行反向延伸
+	 * 
+	 * @param kh
+	 * @param data
+	 *            paired-end reads信息
+	 * @param node_index
+	 *            要处理的顶点标号
+	 * @param bifurcation
+	 *            分叉点
+	 */
 	public void reverse_extend_use_pairInfo(kmerHash kh, Vector<String> data, int node_index,
 			Vector<Long> bifurcation) {
 		int middle_read_id = data.size() / 2;
@@ -541,6 +681,18 @@ public class SplicingGraph {
 		}
 	}
 
+	/**
+	 * 寻找延伸过程中的最后一个k-mer
+	 * 
+	 * @param kh
+	 * @param seed_intval
+	 *            种子k-mer
+	 * @param stop_kmer
+	 *            终止k-mer
+	 * @param str
+	 *            用来存储延伸过程中得到的字符串
+	 * @return 返回延伸过程中的最后一个k-mer
+	 */
 	public long find_tail_kmer(kmerHash kh, long seed_intval, long stop_kmer, StringBuffer str) {
 		List<Map.Entry<Long, Long>> candidates = new ArrayList<Map.Entry<Long, Long>>();
 		long intval = seed_intval;
@@ -574,6 +726,14 @@ public class SplicingGraph {
 		return intval;
 	}
 
+	/**
+	 * 判断两个序列是否是兼容的
+	 * 
+	 * @param seq1
+	 * @param seq2
+	 * @param kh
+	 * @return
+	 */
 	public boolean compatible(String seq1, String seq2, kmerHash kh) {
 		for (int i = 0; i < seq2.length() - kh.kmer_length; i++) {
 			String kmer = seq2.substring(i, i + kh.kmer_length);
@@ -591,6 +751,13 @@ public class SplicingGraph {
 
 	}
 
+	/**
+	 * 判断两个序列是否是可以联配的
+	 * 
+	 * @param seq1
+	 * @param seq2
+	 * @return
+	 */
 	public boolean is_aligned(String seq1, String seq2) {
 		int mismatch = 0;
 		int length;
@@ -606,6 +773,13 @@ public class SplicingGraph {
 		return (mismatch <= 2);
 	}
 
+	/**
+	 * 将字符串str中所有的k-mer都加入到used_kmers中，表示已被使用
+	 * 
+	 * @param kh
+	 * @param str
+	 * @return
+	 */
 	public boolean add_used_kmers(kmerHash kh, String str) {
 		int length = str.length();
 		if (length >= kh.kmer_length) {
@@ -620,6 +794,15 @@ public class SplicingGraph {
 		return true;
 	}
 
+	/**
+	 * 判断两个序列是否相似
+	 * 
+	 * @param seq1
+	 * @param seq2
+	 * @param direction
+	 *            表明是从正向开始判断，还是反向进行判断
+	 * @return
+	 */
 	public boolean is_similar(String seq1, String seq2, char direction) {
 		int mismatch = 0;
 		int length;
@@ -653,6 +836,18 @@ public class SplicingGraph {
 		}
 	}
 
+	/**
+	 * 在延伸过程中，寻找反向延伸后的字符串的第一个k-mer
+	 * 
+	 * @param kh
+	 * @param seed_intval
+	 *            种子k-mer
+	 * @param stop_kmer
+	 *            终止k-mer
+	 * @param str
+	 *            反向延伸得到的字符串
+	 * @return
+	 */
 	public long find_head_kmer(kmerHash kh, long seed_intval, long stop_kmer, StringBuffer str) {
 		List<Map.Entry<Long, Long>> candidates = new ArrayList<Map.Entry<Long, Long>>();
 		long intval = seed_intval;
@@ -687,6 +882,15 @@ public class SplicingGraph {
 
 	}
 
+	/**
+	 * 得到序列seq中所有k-mer覆盖的所有reads的编号
+	 * 
+	 * @param kh
+	 * @param seq
+	 *            序列
+	 * @param reads
+	 *            存储所有reads编号，这些编号是不重复的
+	 */
 	public void set_reads(kmerHash kh, String seq, Set reads) {
 		// 返回seq覆盖到的所有reads的编号 不重复
 		if (seq.length() < kh.kmer_length) {
@@ -705,6 +909,11 @@ public class SplicingGraph {
 		}
 	}
 
+	/**
+	 * 重写顶点集合
+	 * 
+	 * @param node_jihe
+	 */
 	public void rewrite_nodeSet(Set node_jihe) {
 		// TODO Auto-generated method stub
 		node_set.clear();
@@ -717,6 +926,17 @@ public class SplicingGraph {
 		}
 	}
 
+	/**
+	 * 正向延伸 在得到的trunk的基础上，进行正向的构图和扩展，检查是否有分支，如果存在分支则需对顶点进行拆分，得到初始的splice graph。
+	 * 该方法记录trunk上的分叉点，如果分叉点>0，则进行分叉
+	 * 
+	 * @param kmer_int
+	 *            用于正向延伸的种子k-mer
+	 * @param bifurcation
+	 *            用于存放分叉点
+	 * @param kh
+	 * @return
+	 */
 	public void forward_check_and_extend(kmerHash kh, int node_index) {
 		// System.out.println("处理第"+node_index+"个顶点"+"
 		// "+node_set.get(node_index).sequence);
@@ -754,6 +974,16 @@ public class SplicingGraph {
 		grow_and_branch(kh, node_index, bifurcations);
 	}
 
+	/**
+	 * 在正向构图之后可能会出现很多个顶点，在这些顶点的基础上，对每一个顶点进行反向构图。
+	 * 
+	 * @param kmer_int
+	 *            种子k-mer
+	 * @param bifurcation
+	 *            用于存放分叉点
+	 * @param kh
+	 * @return
+	 */
 	public void reverse_check_and_extend(kmerHash kh, int node_index) {
 		int length = node_set.get(node_index).sequence.length() - kh.kmer_length;
 		Vector<Long> bifurcations = new Vector<Long>();
@@ -811,6 +1041,11 @@ public class SplicingGraph {
 		} // for
 	}
 
+	/**
+	 * 对每个顶点进行反向检查、构图
+	 * 
+	 * @param kh
+	 */
 	public void reverse_check_and_extend(kmerHash kh) {
 		for (int i = 0; i < node_set.size(); i++) {
 			// if(forward_branches.contains(i)){
@@ -820,8 +1055,18 @@ public class SplicingGraph {
 		}
 	}
 
+	/**
+	 * 增加树杈。当分支不能再回到主干时，将分支作为树杈分出去。
+	 * 
+	 * @param node_p
+	 *            顶点标号
+	 * @param str
+	 *            分叉的序列
+	 * @param kh
+	 * @return
+	 */
 	int add_reverse_branch(int node_p, String str, kmerHash kh) {
-		if(node_set.get(node_p).getSequence().indexOf("AATTTAATGAATAAACACTGGGGTT")!=-1){
+		if (node_set.get(node_p).getSequence().indexOf("AATTTAATGAATAAACACTGGGGTT") != -1) {
 			System.out.println("node_p有错");
 		}
 		int str_length = str.length() - kh.kmer_length;
@@ -848,12 +1093,10 @@ public class SplicingGraph {
 			Node node2 = new Node();
 			node1.sequence = node_set.get(node_p).sequence.substring(start);
 			node2.sequence = str.substring(0, str_length);
-			if(node2.sequence.length()==0)
-			{
+			if (node2.sequence.length() == 0) {
 				System.out.println("2错误！");
 			}
-			if(node1.sequence.length()==0)
-			{
+			if (node1.sequence.length() == 0) {
 				System.out.println("1错误！");
 			}
 
@@ -877,16 +1120,14 @@ public class SplicingGraph {
 			if (node_p == 0 && start < 2 * kh.kmer_length) {
 				node_set.get(node_p)
 						.setSequence(str.substring(0, str_length) + node_set.get(node_p).sequence.substring(start));
-				if(node_set.get(node_p).getSequence().length()==0)
-				{
+				if (node_set.get(node_p).getSequence().length() == 0) {
 					System.out.println("p错误！");
 				}
 				return -2;
 			}
 
 			node_set.get(node_p).setSequence(node_set.get(node_p).sequence.substring(0, start));
-			if(node_set.get(node_p).getSequence().length()==0)
-			{
+			if (node_set.get(node_p).getSequence().length() == 0) {
 				System.out.println("p错误！");
 			}
 			int node1_index = add_node(node1);
@@ -900,7 +1141,7 @@ public class SplicingGraph {
 			int node2_index = add_node(node2);
 			node_set.get(node2_index).addChildren(node1_index);
 			reverse_branches.add(node2_index);
-			if(node_set.get(node2_index).getSequence().indexOf("AATTTAATGAATAAACACTGGGGTT")!=-1){
+			if (node_set.get(node2_index).getSequence().indexOf("AATTTAATGAATAAACACTGGGGTT") != -1) {
 				System.out.println("node_p有错");
 			}
 			return node2_index;
@@ -910,8 +1151,18 @@ public class SplicingGraph {
 		}
 	}
 
+	/**
+	 * 反向将树杈连接回主干
+	 * 
+	 * @param node_p
+	 *            顶点标号
+	 * @param str
+	 *            分叉序列
+	 * @param kh
+	 * @return
+	 */
 	public int add_reverse_bubble(int node_p, String str, kmerHash kh) {
-		if(node_set.get(node_p).getSequence().indexOf("AATTTAATGAATAAACACTGGGGTT")!=-1){
+		if (node_set.get(node_p).getSequence().indexOf("AATTTAATGAATAAACACTGGGGTT") != -1) {
 			System.out.println("node_p有错");
 		}
 		if (str.length() < 2 * kh.min_anchor_length) {
@@ -929,12 +1180,12 @@ public class SplicingGraph {
 		String anchor_left = str.substring(0, kh.kmer_length - 1);
 		int node_q = -1;
 
-		//while (anchor_left.length() > kh.min_anchor_length) {
-			node_q = find_node_index(anchor_left);
-		//	if (node_q >= 0)
-		//		break;
-		//	anchor_left = anchor_left.substring(1);
-		//}
+		// while (anchor_left.length() > kh.min_anchor_length) {
+		node_q = find_node_index(anchor_left);
+		// if (node_q >= 0)
+		// break;
+		// anchor_left = anchor_left.substring(1);
+		// }
 		Set<Integer> checked = new HashSet<Integer>();
 		if (node_q < 0 || node_p == node_q || has_path(node_p, node_q, checked)) {
 			return -1;
@@ -974,16 +1225,25 @@ public class SplicingGraph {
 				node_set.get(node_p).addChildren(node2_index);
 				node_set.get(node_p).setSequence(node_set.get(node_p).sequence.substring(0, start));
 			}
-			//即length小于0的情况
+			// 即length小于0的情况
 			if (node1_index != node_q)
 				return node1_index;
-			if(node_set.get(node1_index).getSequence().indexOf("AATTTAATGAATAAACACTGGGGTT")!=-1){
+			if (node_set.get(node1_index).getSequence().indexOf("AATTTAATGAATAAACACTGGGGTT") != -1) {
 				System.out.println("node_p有错");
 			}
 		}
 		return -1;
 	}
 
+	/**
+	 * 对于trunk上的每一个分叉点，进行分叉操作
+	 * 
+	 * @param kh
+	 * @param node_index
+	 *            顶点标号
+	 * @param bifurcations
+	 *            trunk上的分叉点
+	 */
 	// long intvalg;
 	public void grow_and_branch(kmerHash kh, int node_index, Vector<Long> bifurcations) {
 
@@ -1017,7 +1277,7 @@ public class SplicingGraph {
 				if (bubble_val == -2) {
 					bubble_val = add_branch(node_index, str, kh);
 					if (bubble_val > 0) {
-					//	System.out.println("forward_add_branch成功！");
+						// System.out.println("forward_add_branch成功！");
 						forward_branches.add(bubble_val);
 						node_set.get(bubble_val)
 								.setSequence(node_set.get(bubble_val).sequence.substring(kh.kmer_length));
@@ -1026,7 +1286,7 @@ public class SplicingGraph {
 			} else {
 				int bubble_val = add_branch(node_index, str, kh);
 				if (bubble_val > 0) {
-					//System.out.println("forward_add_branch成功！");
+					// System.out.println("forward_add_branch成功！");
 
 					forward_branches.add(bubble_val);
 					node_set.get(bubble_val).setSequence(node_set.get(bubble_val).sequence.substring(kh.kmer_length));
@@ -1036,47 +1296,57 @@ public class SplicingGraph {
 		} // while
 	}
 
+	/**
+	 * 对于trunk上的每一个分叉点，如果该分叉点正向延伸得到的str最终能够连回主干，进行该操作。
+	 * 
+	 * @param node_p
+	 *            顶点标号
+	 * @param str
+	 *            分叉序列
+	 * @param kh
+	 * @return
+	 */
 	public int add_bubble(int node_p, String str, kmerHash kh) {
 
 		if (str.length() < 2 * kh.min_anchor_length) {
 			return -1;
 		}
-		if(node_set.get(node_p).getSequence().indexOf("AATTTAATGAATAAACACTGGGGTT")!=-1){
+		if (node_set.get(node_p).getSequence().indexOf("AATTTAATGAATAAACACTGGGGTT") != -1) {
 			System.out.println("node_p有错");
 		}
 		String anchor_left = str.substring(0, kh.kmer_length);
 		int start = node_set.get(node_p).sequence.indexOf(anchor_left);
 		// 如果找不到则不断缩小anchor_left
 		if (start == -1) {
-//			while (anchor_left.length() > kh.min_anchor_length) {
-//				anchor_left = anchor_left.substring(0, anchor_left.length() - 1);
-//				start = node_set.get(node_p).sequence.indexOf(anchor_left);
-//				if (start != -1) {
-//					break; // 直至找到为止
-//				}
-//			}
-			//if (start == -1) {
-				// System.out.println("node_p:"+node_set.get(node_p).getSequence());
-				// System.out.println("str:"+str);
-				// System.out.println("anchor_left:"+anchor_left);
-				// System.out.println(baseOptions.intvalToKmer(intvalg,
-				// kh.kmer_length));
-				// System.out.println(node_set.get(node_p).getSequence());
-				System.out.println("无法找到起始anchor！");
-				return -6;
-		//	}
+			// while (anchor_left.length() > kh.min_anchor_length) {
+			// anchor_left = anchor_left.substring(0, anchor_left.length() - 1);
+			// start = node_set.get(node_p).sequence.indexOf(anchor_left);
+			// if (start != -1) {
+			// break; // 直至找到为止
+			// }
+			// }
+			// if (start == -1) {
+			// System.out.println("node_p:"+node_set.get(node_p).getSequence());
+			// System.out.println("str:"+str);
+			// System.out.println("anchor_left:"+anchor_left);
+			// System.out.println(baseOptions.intvalToKmer(intvalg,
+			// kh.kmer_length));
+			// System.out.println(node_set.get(node_p).getSequence());
+			System.out.println("无法找到起始anchor！");
+			return -6;
+			// }
 		}
 
 		String anchor_right = str.substring(str.length() - kh.kmer_length + 1);
 		int node_q = -1;
 		node_q = find_node_index(anchor_right);
-//		while (anchor_right.length() > kh.min_anchor_length) {
-//			node_q = find_node_index(anchor_right);
-//			if (node_q >= 0) {
-//				break;
-//			}
-//			anchor_right = anchor_right.substring(1);
-//		}
+		// while (anchor_right.length() > kh.min_anchor_length) {
+		// node_q = find_node_index(anchor_right);
+		// if (node_q >= 0) {
+		// break;
+		// }
+		// anchor_right = anchor_right.substring(1);
+		// }
 		if (node_q == -1) {
 			restore_kmers(str, kh);
 			return -2;
@@ -1141,12 +1411,11 @@ public class SplicingGraph {
 			Node node2 = new Node();
 			// System.out.println("&&&&&&&:"+node_set.get(node_p).sequence);
 			node1.sequence = node_set.get(node_p).sequence.substring(end);
-			if(node1.sequence.length()==0)
-			{
+			if (node1.sequence.length() == 0) {
 				System.out.println("1c错误！");
 			}
 			// TODO Auto-generated method stub 可修改
-			//if(node1.sequence.length()>=15){
+			// if(node1.sequence.length()>=15){
 			int node1_index = add_node(node1);
 			for (int i = 0; i < node_set.get(node_p).children.size(); i++) {
 				node_set.get(node1_index).addChildren(node_set.get(node_p).children.get(i));
@@ -1166,8 +1435,7 @@ public class SplicingGraph {
 					node3.sequence = node_set.get(node_p).sequence.substring(start + anchor_left_length,
 							start + anchor_left_length + distance);
 				}
-				if(node3.sequence.length()==0)
-				{
+				if (node3.sequence.length() == 0) {
 					System.out.println("3c错误！");
 				}
 				int node3_index = add_node(node3);
@@ -1211,7 +1479,7 @@ public class SplicingGraph {
 			if (start + anchor_left_length < node_set.get(node_p).sequence.length()) {
 				// 只能小于或等于 如果等于，无需再进行操作
 				node1.sequence = node_set.get(node_p).sequence.substring(start + anchor_left_length);
-				if(node1.sequence.length()==0){
+				if (node1.sequence.length() == 0) {
 					System.out.println("1错误！");
 				}
 				node_set.get(node_p)
@@ -1234,8 +1502,7 @@ public class SplicingGraph {
 			} else {
 				node2_index = node_p; // ?
 			}
-			if(node_set.get(node2_index).getSequence().length()==0)
-			{
+			if (node_set.get(node2_index).getSequence().length() == 0) {
 				System.out.println("2错误！");
 			}
 			if (end == 0) {
@@ -1254,9 +1521,9 @@ public class SplicingGraph {
 					node_set.get(node_q).addChildren(node3_index);
 					node_set.get(node2_index).addChildren(node3_index);
 					node_set.get(node_q).setSequence(node_set.get(node_q).sequence.substring(0, end));
-					//.sequence = node_set.get(node_q).sequence.substring(0, end);
-					if(node_set.get(node3_index).getSequence().length()==0)
-					{
+					// .sequence = node_set.get(node_q).sequence.substring(0,
+					// end);
+					if (node_set.get(node3_index).getSequence().length() == 0) {
 						System.out.println("3错误！");
 					}
 				}
@@ -1268,16 +1535,15 @@ public class SplicingGraph {
 			// "+node_set.get(node_p).sequence);
 			// System.out.println(node1_index+" "+"node1"+"
 			// "+node_set.get(node1_index).sequence);
-//
-//			if(node_set.get(node1_index).getSequence().length()==0||node_set.get(node2_index).getSequence().length()==0||node_set.get(node_p).getSequence().length()==0||node_set.get(node1_index).getSequence().length()==0){
-//				System.out.println("add_bubble!错误");
-//			}
-			
-			
+			//
+			// if(node_set.get(node1_index).getSequence().length()==0||node_set.get(node2_index).getSequence().length()==0||node_set.get(node_p).getSequence().length()==0||node_set.get(node1_index).getSequence().length()==0){
+			// System.out.println("add_bubble!错误");
+			// }
+
 			if (node2_index == node_p) {
 				return -1;
 			} else {
-				if(node_set.get(node2_index).getSequence().indexOf("AATTTAATGAATAAACACTGGGGTT")!=-1){
+				if (node_set.get(node2_index).getSequence().indexOf("AATTTAATGAATAAACACTGGGGTT") != -1) {
 					System.out.println("node_p有错");
 				}
 				return node2_index;
@@ -1286,6 +1552,508 @@ public class SplicingGraph {
 
 	}
 
+	public int add_bubble_forward(int node_p, String str, kmerHash kh) {
+
+		if (str.length() < 2 * kh.min_anchor_length) {
+			return -1;
+		}
+		if (node_set.get(node_p).getSequence().indexOf("AATTTAATGAATAAACACTGGGGTT") != -1) {
+			System.out.println("node_p有错");
+		}
+		String anchor_left = str.substring(0, kh.kmer_length);
+		int start = node_set.get(node_p).sequence.indexOf(anchor_left);
+		// 如果找不到则不断缩小anchor_left
+		if (start == -1) {
+			// while (anchor_left.length() > kh.min_anchor_length) {
+			// anchor_left = anchor_left.substring(0, anchor_left.length() - 1);
+			// start = node_set.get(node_p).sequence.indexOf(anchor_left);
+			// if (start != -1) {
+			// break; // 直至找到为止
+			// }
+			// }
+			// if (start == -1) {
+			// System.out.println("node_p:"+node_set.get(node_p).getSequence());
+			// System.out.println("str:"+str);
+			// System.out.println("anchor_left:"+anchor_left);
+			// System.out.println(baseOptions.intvalToKmer(intvalg,
+			// kh.kmer_length));
+			// System.out.println(node_set.get(node_p).getSequence());
+			System.out.println("无法找到起始anchor！");
+			return -6;
+			// }
+		}
+
+		String anchor_right = str.substring(str.length() - kh.kmer_length + 1);
+		int node_q = -1;
+		node_q = find_node_index(anchor_right);
+		// while (anchor_right.length() > kh.min_anchor_length) {
+		// node_q = find_node_index(anchor_right);
+		// if (node_q >= 0) {
+		// break;
+		// }
+		// anchor_right = anchor_right.substring(1);
+		// }
+		if (node_q == -1) {
+			restore_kmers(str, kh);
+			return -2;
+		}
+
+		int anchor_left_length = anchor_left.length();
+		int anchor_right_length = anchor_right.length();
+		int end = node_set.get(node_q).sequence.indexOf(anchor_right);
+
+		// 根据连接处的cov判断是否可以连接
+		// System.out.println(0.5 * anchor_left_length+kh.kmer_length);
+		// System.out.println(str.length());
+		// if((0.5 * anchor_left_length + kh.kmer_length)>kh.kmer_length){
+		// return -1;
+		// }
+		String jun1 = str.substring((int) (0.5 * anchor_left_length),
+				(int) (0.5 * anchor_left_length + kh.kmer_length));
+		long jun1_cov = kh.get_readset_count(kh.kmer_hash, baseOptions.kmerToIntval(jun1));
+		String jun2 = str.substring(str.length() - kh.kmer_length - (int) (0.5 * anchor_right_length),
+				str.length() - kh.kmer_length - (int) (0.5 * anchor_right_length) + kh.kmer_length);
+		long jun2_cov = kh.get_readset_count(kh.kmer_hash, baseOptions.kmerToIntval(jun2));
+		if (jun1_cov < kh.min_function_count || jun2_cov < kh.min_function_count) {
+			System.out.println("连接点cov太小，无法连接！");
+			return -1;
+		}
+
+		int length = str.length() - anchor_left_length - anchor_right_length; // str有多少未被使用
+
+		if (node_p == node_q) { // 顶点本身回归
+			// TODO Auto-generated method stub 可修改
+			if (end <= start) {
+				return -1;
+			}
+			int distance = end - start - anchor_left_length; // 表示end与start之间是否比anchor_left大
+			if (length + distance < 4) {
+				return -1;
+			}
+			if ((distance == 0 && length < kh.kmer_length) || (length == 0 && distance < kh.kmer_length)) {
+				return -1;
+			}
+			if (distance > 0 && length == distance
+					&& is_similar(
+							node_set.get(node_p).sequence.substring(start + anchor_left_length,
+									start + anchor_left_length + distance),
+					str.substring(anchor_left_length, anchor_left_length + length), 'F')) {
+				// 重合
+				return -1;
+			}
+			if (length <= 0 && distance <= 0) {
+				return -1;
+			} else if (length < 0) {
+				anchor_left_length = anchor_left_length + length;
+			} else if (distance < 0) {
+				anchor_left_length = anchor_left_length + distance; // 设置
+																	// anchor_left与anchor_right刚好完全占据str
+			}
+			if ((int) start + anchor_left_length <= kh.kmer_length) // necessary
+			{
+				return -1;
+			}
+			Node node1 = new Node();
+			Node node2 = new Node();
+			// System.out.println("&&&&&&&:"+node_set.get(node_p).sequence);
+			node1.sequence = node_set.get(node_p).sequence.substring(end);
+			if (node1.sequence.length() == 0) {
+				System.out.println("1c错误！");
+			}
+			// TODO Auto-generated method stub 可修改
+			// if(node1.sequence.length()>=15){
+			int node1_index = add_node(node1);
+			for (int i = 0; i < node_set.get(node_p).children.size(); i++) {
+				node_set.get(node1_index).addChildren(node_set.get(node_p).children.get(i));
+			}
+			node_set.get(node_p).children.clear();
+			int node2_index = -1;
+			if (distance <= 0) { // 此时length>0
+				node_set.get(node_p)
+						.setSequence(node_set.get(node_p).sequence.substring(0, start + anchor_left_length));
+				node_set.get(node_p).addChildren(node1_index);
+			} else {
+				Node node3 = new Node();
+				if (length < 0) {
+					node3.sequence = node_set.get(node_p).sequence.substring(start + anchor_left_length,
+							start + anchor_left_length + distance - length);
+				} else {
+					node3.sequence = node_set.get(node_p).sequence.substring(start + anchor_left_length,
+							start + anchor_left_length + distance);
+				}
+				if (node3.sequence.length() == 0) {
+					System.out.println("3c错误！");
+				}
+				int node3_index = add_node(node3);
+				node_set.get(node3_index).addChildren(node1_index);
+				node_set.get(node_p)
+						.setSequence(node_set.get(node_p).sequence.substring(0, start + anchor_left_length));
+				node_set.get(node_p).addChildren(node3_index);
+			}
+			if (length > 0) {
+				if (distance < 0) {
+					node2.sequence = str.substring(anchor_left_length, anchor_left_length + length - distance);
+				} else {
+					node2.sequence = str.substring(anchor_left_length, anchor_left_length + length);
+				}
+				node2_index = add_node(node2);
+				node_set.get(node2_index).addChildren(node1_index);
+				node_set.get(node_p).addChildren(node2_index);
+			} else {
+				node_set.get(node_p).addChildren(node1_index);
+			}
+			return node2_index; // 新增顶点标号
+		} else {
+			Set<Integer> checked = new HashSet<Integer>();
+			if (node_q == 0 || has_path(node_p, node_q, checked)) {
+				return -1;
+			}
+			if (node_set.get(node_p).isChild(node_q) && length > 0
+					&& node_set.get(node_p).sequence.length() - start + end < kh.kmer_length) {
+				return -1;
+			}
+			Node node1 = new Node();
+			Node node2 = new Node();
+			int node1_index = -1;
+			int node2_index = -1;
+			if (length < 0) {
+				anchor_left_length = anchor_left_length + length;
+			}
+			if (start + anchor_left_length <= kh.kmer_length) {
+				return -1;
+			}
+			if (start + anchor_left_length < node_set.get(node_p).sequence.length()) {
+				// 只能小于或等于 如果等于，无需再进行操作
+				node1.sequence = node_set.get(node_p).sequence.substring(start + anchor_left_length);
+				if (node1.sequence.length() == 0) {
+					System.out.println("1错误！");
+				}
+				node_set.get(node_p)
+						.setSequence(node_set.get(node_p).sequence.substring(0, start + anchor_left_length));
+				// node_set.get(node_p).sequence.substring(0, start +
+				// anchor_left_length);
+				node1_index = add_node(node1);
+				for (int i = 0; i < node_set.get(node_p).children.size(); i++) {
+					node_set.get(node1_index).addChildren(node_set.get(node_p).children.get(i));
+				}
+				// node_set.get(node1_index).children =
+				// node_set.get(node_p).children;
+				node_set.get(node_p).children.clear();
+				node_set.get(node_p).addChildren(node1_index);
+			}
+			if (length > 0) {
+				node2.sequence = str.substring(anchor_left_length, anchor_left_length + length);
+				node2_index = add_node(node2);
+				node_set.get(node_p).addChildren(node2_index);
+			} else {
+				node2_index = node_p; // ?
+			}
+			if (node_set.get(node2_index).getSequence().length() == 0) {
+				System.out.println("2错误！");
+			}
+			if (end == 0) {
+				node_set.get(node2_index).addChildren(node_q);
+			} else {
+				Node node3 = new Node();
+				if (node_set.get(node_q).sequence.length() >= end) {
+					node3.sequence = node_set.get(node_q).sequence.substring(end);
+					int node3_index = add_node(node3);
+					for (int i = 0; i < node_set.get(node_q).children.size(); i++) {
+						node_set.get(node3_index).addChildren(node_set.get(node_q).children.get(i));
+					}
+					// node_set.get(node3_index).children =
+					// node_set.get(node_q).children;
+					node_set.get(node_q).children.clear();
+					node_set.get(node_q).addChildren(node3_index);
+					node_set.get(node2_index).addChildren(node3_index);
+					node_set.get(node_q).setSequence(node_set.get(node_q).sequence.substring(0, end));
+					// .sequence = node_set.get(node_q).sequence.substring(0,
+					// end);
+					if (node_set.get(node3_index).getSequence().length() == 0) {
+						System.out.println("3错误！");
+					}
+				}
+			}
+			// System.out.println("add_bubble之后的节点为：");
+			// System.out.println(node2_index+" "+"node2"+"
+			// "+node_set.get(node2_index).sequence);
+			// System.out.println(node_p+" "+"p"+"
+			// "+node_set.get(node_p).sequence);
+			// System.out.println(node1_index+" "+"node1"+"
+			// "+node_set.get(node1_index).sequence);
+			//
+			// if(node_set.get(node1_index).getSequence().length()==0||node_set.get(node2_index).getSequence().length()==0||node_set.get(node_p).getSequence().length()==0||node_set.get(node1_index).getSequence().length()==0){
+			// System.out.println("add_bubble!错误");
+			// }
+
+			if (node2_index == node_p) {
+				return -1;
+			} else {
+				if (node_set.get(node2_index).getSequence().indexOf("AATTTAATGAATAAACACTGGGGTT") != -1) {
+					System.out.println("node_p有错");
+				}
+				return node2_index;
+			}
+		}
+
+	}
+	public int add_bubble_bei(int node_p, String str, kmerHash kh) {
+
+		if (str.length() < 2 * kh.min_anchor_length) {
+			return -1;
+		}
+		if (node_set.get(node_p).getSequence().indexOf("AATTTAATGAATAAACACTGGGGTT") != -1) {
+			System.out.println("node_p有错");
+		}
+		String anchor_left = str.substring(0, kh.kmer_length);
+		int start = node_set.get(node_p).sequence.indexOf(anchor_left);
+		// 如果找不到则不断缩小anchor_left
+		if (start == -1) {
+			// while (anchor_left.length() > kh.min_anchor_length) {
+			// anchor_left = anchor_left.substring(0, anchor_left.length() - 1);
+			// start = node_set.get(node_p).sequence.indexOf(anchor_left);
+			// if (start != -1) {
+			// break; // 直至找到为止
+			// }
+			// }
+			// if (start == -1) {
+			// System.out.println("node_p:"+node_set.get(node_p).getSequence());
+			// System.out.println("str:"+str);
+			// System.out.println("anchor_left:"+anchor_left);
+			// System.out.println(baseOptions.intvalToKmer(intvalg,
+			// kh.kmer_length));
+			// System.out.println(node_set.get(node_p).getSequence());
+			System.out.println("无法找到起始anchor！");
+			return -6;
+			// }
+		}
+
+		String anchor_right = str.substring(str.length() - kh.kmer_length + 1);
+		int node_q = -1;
+		node_q = find_node_index(anchor_right);
+		// while (anchor_right.length() > kh.min_anchor_length) {
+		// node_q = find_node_index(anchor_right);
+		// if (node_q >= 0) {
+		// break;
+		// }
+		// anchor_right = anchor_right.substring(1);
+		// }
+		if (node_q == -1) {
+			restore_kmers(str, kh);
+			return -2;
+		}
+
+		int anchor_left_length = anchor_left.length();
+		int anchor_right_length = anchor_right.length();
+		int end = node_set.get(node_q).sequence.indexOf(anchor_right);
+
+		// 根据连接处的cov判断是否可以连接
+		// System.out.println(0.5 * anchor_left_length+kh.kmer_length);
+		// System.out.println(str.length());
+		// if((0.5 * anchor_left_length + kh.kmer_length)>kh.kmer_length){
+		// return -1;
+		// }
+		String jun1 = str.substring((int) (0.5 * anchor_left_length),
+				(int) (0.5 * anchor_left_length + kh.kmer_length));
+		long jun1_cov = kh.get_readset_count(kh.kmer_hash, baseOptions.kmerToIntval(jun1));
+		String jun2 = str.substring(str.length() - kh.kmer_length - (int) (0.5 * anchor_right_length),
+				str.length() - kh.kmer_length - (int) (0.5 * anchor_right_length) + kh.kmer_length);
+		long jun2_cov = kh.get_readset_count(kh.kmer_hash, baseOptions.kmerToIntval(jun2));
+		if (jun1_cov < kh.min_function_count || jun2_cov < kh.min_function_count) {
+			System.out.println("连接点cov太小，无法连接！");
+			return -1;
+		}
+
+		int length = str.length() - anchor_left_length - anchor_right_length; // str有多少未被使用
+
+		if (node_p == node_q) { // 顶点本身回归
+			// TODO Auto-generated method stub 可修改
+			if (end <= start) {
+				return -1;
+			}
+			int distance = end - start - anchor_left_length; // 表示end与start之间是否比anchor_left大
+			if (length + distance < 4) {
+				return -1;
+			}
+			if ((distance == 0 && length < kh.kmer_length) || (length == 0 && distance < kh.kmer_length)) {
+				return -1;
+			}
+			if (distance > 0 && length == distance
+					&& is_similar(
+							node_set.get(node_p).sequence.substring(start + anchor_left_length,
+									start + anchor_left_length + distance),
+					str.substring(anchor_left_length, anchor_left_length + length), 'F')) {
+				// 重合
+				return -1;
+			}
+			if (length <= 0 && distance <= 0) {
+				return -1;
+			} else if (length < 0) {
+				anchor_left_length = anchor_left_length + length;
+			} else if (distance < 0) {
+				anchor_left_length = anchor_left_length + distance; // 设置
+																	// anchor_left与anchor_right刚好完全占据str
+			}
+			if ((int) start + anchor_left_length <= kh.kmer_length) // necessary
+			{
+				return -1;
+			}
+			Node node1 = new Node();
+			Node node2 = new Node();
+			// System.out.println("&&&&&&&:"+node_set.get(node_p).sequence);
+			node1.sequence = node_set.get(node_p).sequence.substring(end);
+			if (node1.sequence.length() == 0) {
+				System.out.println("1c错误！");
+			}
+			// TODO Auto-generated method stub 可修改
+			// if(node1.sequence.length()>=15){
+			int node1_index = add_node(node1);
+			for (int i = 0; i < node_set.get(node_p).children.size(); i++) {
+				node_set.get(node1_index).addChildren(node_set.get(node_p).children.get(i));
+			}
+			node_set.get(node_p).children.clear();
+			int node2_index = -1;
+			if (distance <= 0) { // 此时length>0
+				node_set.get(node_p)
+						.setSequence(node_set.get(node_p).sequence.substring(0, start + anchor_left_length));
+				node_set.get(node_p).addChildren(node1_index);
+			} else {
+				Node node3 = new Node();
+				if (length < 0) {
+					node3.sequence = node_set.get(node_p).sequence.substring(start + anchor_left_length,
+							start + anchor_left_length + distance - length);
+				} else {
+					node3.sequence = node_set.get(node_p).sequence.substring(start + anchor_left_length,
+							start + anchor_left_length + distance);
+				}
+				if (node3.sequence.length() == 0) {
+					System.out.println("3c错误！");
+				}
+				int node3_index = add_node(node3);
+				node_set.get(node3_index).addChildren(node1_index);
+				node_set.get(node_p)
+						.setSequence(node_set.get(node_p).sequence.substring(0, start + anchor_left_length));
+				node_set.get(node_p).addChildren(node3_index);
+			}
+			if (length > 0) {
+				if (distance < 0) {
+					node2.sequence = str.substring(anchor_left_length, anchor_left_length + length - distance);
+				} else {
+					node2.sequence = str.substring(anchor_left_length, anchor_left_length + length);
+				}
+				node2_index = add_node(node2);
+				node_set.get(node2_index).addChildren(node1_index);
+				node_set.get(node_p).addChildren(node2_index);
+			} else {
+				node_set.get(node_p).addChildren(node1_index);
+			}
+			return node2_index; // 新增顶点标号
+		} else {
+			Set<Integer> checked = new HashSet<Integer>();
+			if (node_q == 0 || has_path(node_p, node_q, checked)) {
+				return -1;
+			}
+			if (node_set.get(node_p).isChild(node_q) && length > 0
+					&& node_set.get(node_p).sequence.length() - start + end < kh.kmer_length) {
+				return -1;
+			}
+			Node node1 = new Node();
+			Node node2 = new Node();
+			int node1_index = -1;
+			int node2_index = -1;
+			if (length < 0) {
+				anchor_left_length = anchor_left_length + length;
+			}
+			if (start + anchor_left_length <= kh.kmer_length) {
+				return -1;
+			}
+			if (start + anchor_left_length < node_set.get(node_p).sequence.length()) {
+				// 只能小于或等于 如果等于，无需再进行操作
+				node1.sequence = node_set.get(node_p).sequence.substring(start + anchor_left_length);
+				if (node1.sequence.length() == 0) {
+					System.out.println("1错误！");
+				}
+				node_set.get(node_p)
+						.setSequence(node_set.get(node_p).sequence.substring(0, start + anchor_left_length));
+				// node_set.get(node_p).sequence.substring(0, start +
+				// anchor_left_length);
+				node1_index = add_node(node1);
+				for (int i = 0; i < node_set.get(node_p).children.size(); i++) {
+					node_set.get(node1_index).addChildren(node_set.get(node_p).children.get(i));
+				}
+				// node_set.get(node1_index).children =
+				// node_set.get(node_p).children;
+				node_set.get(node_p).children.clear();
+				node_set.get(node_p).addChildren(node1_index);
+			}
+			if (length > 0) {
+				node2.sequence = str.substring(anchor_left_length, anchor_left_length + length);
+				node2_index = add_node(node2);
+				node_set.get(node_p).addChildren(node2_index);
+			} else {
+				node2_index = node_p; // ?
+			}
+			if (node_set.get(node2_index).getSequence().length() == 0) {
+				System.out.println("2错误！");
+			}
+			if (end == 0) {
+				node_set.get(node2_index).addChildren(node_q);
+			} else {
+				Node node3 = new Node();
+				if (node_set.get(node_q).sequence.length() >= end) {
+					node3.sequence = node_set.get(node_q).sequence.substring(end);
+					int node3_index = add_node(node3);
+					for (int i = 0; i < node_set.get(node_q).children.size(); i++) {
+						node_set.get(node3_index).addChildren(node_set.get(node_q).children.get(i));
+					}
+					// node_set.get(node3_index).children =
+					// node_set.get(node_q).children;
+					node_set.get(node_q).children.clear();
+					node_set.get(node_q).addChildren(node3_index);
+					node_set.get(node2_index).addChildren(node3_index);
+					node_set.get(node_q).setSequence(node_set.get(node_q).sequence.substring(0, end));
+					// .sequence = node_set.get(node_q).sequence.substring(0,
+					// end);
+					if (node_set.get(node3_index).getSequence().length() == 0) {
+						System.out.println("3错误！");
+					}
+				}
+			}
+			// System.out.println("add_bubble之后的节点为：");
+			// System.out.println(node2_index+" "+"node2"+"
+			// "+node_set.get(node2_index).sequence);
+			// System.out.println(node_p+" "+"p"+"
+			// "+node_set.get(node_p).sequence);
+			// System.out.println(node1_index+" "+"node1"+"
+			// "+node_set.get(node1_index).sequence);
+			//
+			// if(node_set.get(node1_index).getSequence().length()==0||node_set.get(node2_index).getSequence().length()==0||node_set.get(node_p).getSequence().length()==0||node_set.get(node1_index).getSequence().length()==0){
+			// System.out.println("add_bubble!错误");
+			// }
+
+			if (node2_index == node_p) {
+				return -1;
+			} else {
+				if (node_set.get(node2_index).getSequence().indexOf("AATTTAATGAATAAACACTGGGGTT") != -1) {
+					System.out.println("node_p有错");
+				}
+				return node2_index;
+			}
+		}
+
+	}
+
+	/**
+	 * 判断q到p是否有路径
+	 * 
+	 * @param node_p
+	 *            顶点p的标号
+	 * @param node_q
+	 *            顶点q的标号
+	 * @param checked
+	 *            q到p之间的顶点集合
+	 * @return
+	 */
 	public boolean has_path(int node_p, int node_q, Set checked) {
 		// 判断q到p是否有路径
 		boolean flag = false;
@@ -1308,6 +2076,12 @@ public class SplicingGraph {
 		return flag;
 	}
 
+	/**
+	 * 寻找含有anchor的顶点标号
+	 * 
+	 * @param anchor
+	 * @return 如果找到返回顶点标号，找不到返回-1
+	 */
 	public int find_node_index(String anchor) {
 		int idx = -1;
 		for (int i = 0; i < node_set.size(); ++i) {
@@ -1319,6 +2093,12 @@ public class SplicingGraph {
 		return idx;
 	}
 
+	/**
+	 * 将str上的每一个k-mer加入restore_kmers
+	 * 
+	 * @param str
+	 * @param kh
+	 */
 	public void restore_kmers(String str, kmerHash kh) {
 
 		if (str.length() < kh.kmer_length) {
@@ -1333,9 +2113,19 @@ public class SplicingGraph {
 
 	}
 
+	/**
+	 * 将分叉点正向延伸的过程中，如果正向延伸得到的str，如果str连接不回主干，则执行该方法
+	 * 
+	 * @param node_p
+	 *            顶点标号
+	 * @param branch
+	 *            分叉序列
+	 * @param kh
+	 * @return
+	 */
 	// 如果在扩展过程中找不到对应的q 则回不到主干，只能作为分支
 	public int add_branch(int node_p, String branch, kmerHash kh) {
-		if(node_set.get(node_p).getSequence().indexOf("AATTTAATGAATAAACACTGGGGTT")!=-1){
+		if (node_set.get(node_p).getSequence().indexOf("AATTTAATGAATAAACACTGGGGTT") != -1) {
 			System.out.println("node_p有错");
 		}
 		if (node_set.get(node_p).sequence.length() <= kh.kmer_length) {
@@ -1364,7 +2154,7 @@ public class SplicingGraph {
 			}
 			Node node1 = new Node();
 			Node node2 = new Node();
-			if (start + kh.kmer_length-1 < node_set.get(node_p).getSequence().length()) {
+			if (start + kh.kmer_length - 1 < node_set.get(node_p).getSequence().length()) {
 				// 需要拆分
 				node1.setSequence(node_set.get(node_p).getSequence().substring(start + kh.kmer_length));
 			}
@@ -1389,14 +2179,12 @@ public class SplicingGraph {
 				node_set.get(node_p).addChildren(node1_index);
 			}
 			int node2_index = add_node(node2);
-			if(node_set.get(node2_index).getSequence().length()==0)
-			{
+			if (node_set.get(node2_index).getSequence().length() == 0) {
 				System.out.println("2错误！");
 			}
-						node_set.get(node_p).addChildren(node2_index);
+			node_set.get(node_p).addChildren(node2_index);
 			node_set.get(node_p).setSequence(node_set.get(node_p).sequence.substring(0, start + kh.kmer_length));
-			if(node_set.get(node_p).getSequence().length()==0)
-			{
+			if (node_set.get(node_p).getSequence().length() == 0) {
 				System.out.println("p错误！");
 			}
 
@@ -1407,6 +2195,16 @@ public class SplicingGraph {
 
 	}
 
+	/**
+	 * 利用paired-end reads进行正向检查
+	 * 
+	 * @param kh
+	 * @param branch
+	 *            分叉序列
+	 * @param count
+	 *            分叉序列第一个k-mer的覆盖度
+	 * @return
+	 */
 	public boolean check_forward_branch_with_pair_info(kmerHash kh, String branch, long count) {
 		// 计算左边的paired_end_read
 		boolean is_branch = false;
@@ -1479,6 +2277,16 @@ public class SplicingGraph {
 		return is_branch;
 	}
 
+	/**
+	 * 利用paired-end reads进行反向检查
+	 * 
+	 * @param kh
+	 * @param branch
+	 *            分叉序列
+	 * @param count
+	 *            分叉序列最后一个k-mer的覆盖度
+	 * @return
+	 */
 	public boolean check_reverse_branch_with_pair_info(kmerHash kh, String branch, long count) {
 		// 计算右边的paired_end_read
 		boolean is_branch = false;
@@ -1559,6 +2367,12 @@ public class SplicingGraph {
 		return is_branch;
 	}
 
+	/**
+	 * 判断是否还可以进行再扩展
+	 * 
+	 * @param kh
+	 * @return
+	 */
 	public boolean if_can_extend(kmerHash kh) {
 		List<Map.Entry<Long, Long>> candidates = new ArrayList<Map.Entry<Long, Long>>();
 		// boolean flag=false;
@@ -1617,6 +2431,17 @@ public class SplicingGraph {
 		return false;
 	}
 
+	/**
+	 * 初始化树干
+	 * 
+	 * @param kh
+	 * @param seed_val
+	 *            种子k-mer
+	 * @param node_jihe
+	 *            顶点集合
+	 * @param splicing_graph
+	 * @return
+	 */
 	public boolean init_trunk(kmerHash kh, long seed_val, Set node_jihe, SplicingGraph splicing_graph) {
 		// TODO Auto-generated method stub
 		used_kmers.put(seed_val, (int) kh.kmer_map.get(seed_val));
@@ -1659,6 +2484,9 @@ public class SplicingGraph {
 		return true;
 	}
 
+	/**
+	 * 重置父节点
+	 */
 	public void init_parents() {
 
 		for (int i = 0; i < node_set.size(); i++) {
@@ -1809,6 +2637,13 @@ public class SplicingGraph {
 	 * Map.Entry<Long, Integer> o2) { return
 	 * o1.getValue().compareTo(o2.getValue()); // 倒序 } }); return list; }
 	 */
+
+	/**
+	 * 计算边的权重
+	 * 
+	 * @param edges
+	 * @param kh
+	 */
 	public void compute_edge_cov(int[][] edges, kmerHash kh) {
 		for (int i = 0; i < node_set.size(); i++) {
 			int child;
@@ -1884,46 +2719,63 @@ public class SplicingGraph {
 		}
 	}
 
-//	public Vector compute_path_kmer_set(Vector<Integer> path,kmerHash kh){
-//		int length = 0;// length代表了路径的总长度
-//		//Vector<Integer> terminal = new Vector<Integer>();// 记录个顶点之间的端点
-//		String path_str = "";
-//		for (int i = 0; i < path.size(); i++) {
-//			length += node_set.get(path.get(i)).getSequence().length();
-//			path_str += node_set.get(path.get(i)).getSequence();
-//			//terminal.add(length - 1);
-//		}
-//		Vector<Integer> kmer_counts = new Vector<Integer>();
-//		for (int i = 0; i <= length - kh.kmer_length; i++) {
-//			String kmer = path_str.substring(i, i + kh.kmer_length);
-//			if (kh.kmer_map.containsKey(baseOptions.kmerToIntval(kmer))) {
-//				kmer_counts.add(kh.kmer_map.get(baseOptions.kmerToIntval(kmer)));
-//			} else {
-//				kmer_counts.add(0);
-//			}
-//		}
-//		return kmer_counts;
-//	}
-	
-	public void reset_kmerMap(kmerHash kh,float max_flow,String path_str){
-		for(int i=0;i<=path_str.length()-kh.kmer_length;i++){
-			String kmer=path_str.substring(i,i+kh.kmer_length);
-			long intval=baseOptions.kmerToIntval(kmer);
-			int count=0;
-			if(kh.kmer_map.containsKey(intval)){
-//				System.out.println(kmer+"   "+intval);
-				count=(int) (kh.kmer_map.get(intval)-max_flow);
+	// public Vector compute_path_kmer_set(Vector<Integer> path,kmerHash kh){
+	// int length = 0;// length代表了路径的总长度
+	// //Vector<Integer> terminal = new Vector<Integer>();// 记录个顶点之间的端点
+	// String path_str = "";
+	// for (int i = 0; i < path.size(); i++) {
+	// length += node_set.get(path.get(i)).getSequence().length();
+	// path_str += node_set.get(path.get(i)).getSequence();
+	// //terminal.add(length - 1);
+	// }
+	// Vector<Integer> kmer_counts = new Vector<Integer>();
+	// for (int i = 0; i <= length - kh.kmer_length; i++) {
+	// String kmer = path_str.substring(i, i + kh.kmer_length);
+	// if (kh.kmer_map.containsKey(baseOptions.kmerToIntval(kmer))) {
+	// kmer_counts.add(kh.kmer_map.get(baseOptions.kmerToIntval(kmer)));
+	// } else {
+	// kmer_counts.add(0);
+	// }
+	// }
+	// return kmer_counts;
+	// }
+	/**
+	 * 在运行最大流算法之后，将使用过的k-mer在kmer_hash中去除，重置kmer_hash
+	 * 
+	 * @param kh
+	 * @param max_flow
+	 *            最大流
+	 * @param path_str
+	 *            路径序列
+	 */
+	public void reset_kmerMap(kmerHash kh, float max_flow, String path_str) {
+		for (int i = 0; i <= path_str.length() - kh.kmer_length; i++) {
+			String kmer = path_str.substring(i, i + kh.kmer_length);
+			long intval = baseOptions.kmerToIntval(kmer);
+			int count = 0;
+			if (kh.kmer_map.containsKey(intval)) {
+				// System.out.println(kmer+" "+intval);
+				count = (int) (kh.kmer_map.get(intval) - max_flow);
 			}
-			//int count=(int) (kh.kmer_map.get(intval)-max_flow);
-			if(count>=0){
+			// int count=(int) (kh.kmer_map.get(intval)-max_flow);
+			if (count >= 0) {
 				kh.kmer_map.put(intval, count);
 			}
-			
+
 		}
-		
+
 	}
-	
-	public String compute_fragment_count(Vector<Integer> path, kmerHash kh,int[][] edges_ter) {
+
+	/**
+	 * 计算两个点之间连接的片段的数量
+	 * 
+	 * @param path
+	 *            路径
+	 * @param kh
+	 * @param edges_ter
+	 * @return
+	 */
+	public String compute_fragment_count(Vector<Integer> path, kmerHash kh, int[][] edges_ter) {
 		int length = 0;// length代表了路径的总长度
 		Vector<Integer> terminal = new Vector<Integer>();// 记录个顶点之间的端点
 		String path_str = "";
@@ -1943,30 +2795,47 @@ public class SplicingGraph {
 				kmer_counts.add(0);
 			}
 		}
-//		for(int i=0;i<path.size();i++){
-//			kmer_counts.addAll(node_kmer_set.get(path.get(i)));
-//		}
-		//System.out.println("****"+kmer_counts);
+		// for(int i=0;i<path.size();i++){
+		// kmer_counts.addAll(node_kmer_set.get(path.get(i)));
+		// }
+		// System.out.println("****"+kmer_counts);
 		int start = 0;
 		int end = length - kh.kmer_length;
 
-	//	System.out.println("fragment_count:" + node_set.size());
+		// System.out.println("fragment_count:" + node_set.size());
 		int[][] fragment_count = new int[node_set.size()][node_set.size()];
 
 		compute_fragment(kmer_counts, start, end, path, terminal, fragment_count, kh);
 
 		for (int i = 0; i < node_set.size(); i++) {
 			for (int j = 0; j < node_set.size(); j++) {
-				edges_ter[i][j]=fragment_count[i][j];
+				edges_ter[i][j] = fragment_count[i][j];
 			}
 		}
-		
-return path_str;
+
+		return path_str;
 	}
 
 	int start_biao = 0;
 	int end_biao = 0;
 
+	/**
+	 * 计算一条路径上两个顶点之间的权重
+	 * 
+	 * @param kmer_counts
+	 *            k-mer覆盖度集合
+	 * @param start
+	 *            开始
+	 * @param end
+	 *            结束
+	 * @param path
+	 *            路径
+	 * @param terminal
+	 *            边界
+	 * @param fragment_count
+	 *            权重（片段数量）
+	 * @param kh
+	 */
 	public void compute_fragment(Vector<Integer> kmer_counts, int start, int end, Vector<Integer> path,
 			Vector<Integer> terminal, int[][] fragment_count, kmerHash kh) {
 
@@ -1978,10 +2847,10 @@ return path_str;
 				break;
 			}
 		}
-//		if (start + kh.kmer_length - 1 > terminal.get(start_index)) {
-//			return;
-//		}
-		if(start>end){
+		// if (start + kh.kmer_length - 1 > terminal.get(start_index)) {
+		// return;
+		// }
+		if (start > end) {
 			return;
 		}
 		if (kmer_counts.size() == 1) {
@@ -2010,9 +2879,9 @@ return path_str;
 			}
 		}
 		if (end_index == start_index && end + kh.kmer_length - 1 <= terminal.get(end_index)) {
-			start_biao=end;
+			start_biao = end;
 			return;
-		} 
+		}
 		Vector<Integer> kmer_counts_asc = new Vector<Integer>();
 		for (int i = 0; i < kmer_counts.size(); i++) {
 			kmer_counts_asc.add(kmer_counts.get(i));
@@ -2038,7 +2907,7 @@ return path_str;
 				count_is_zero.add(i);
 			}
 		}
-		
+
 		// int flag=0;
 		for (int i = 0; i < count_is_zero.size(); i++) {
 			int cer = start;
@@ -2086,8 +2955,8 @@ return path_str;
 				index_index = 0;
 			}
 			// 如果该片段在同一个顶点且不能与其他顶点相连时，跳过处理
-			if (index+cer - 1 + kh.kmer_length - 1 < terminal.get(index_index) && index_index == start_pos) {
-				start_biao = cer+index + 1;
+			if (index + cer - 1 + kh.kmer_length - 1 < terminal.get(index_index) && index_index == start_pos) {
+				start_biao = cer + index + 1;
 				continue;
 			}
 			if (start_biao + index - 1 + kh.kmer_length - 1 == terminal.get(index_index) && index_index == start_pos) {
@@ -2103,6 +2972,15 @@ return path_str;
 		}
 
 	}
+
+	/**
+	 * 计算顶点权重
+	 * 
+	 * @param node_cov
+	 *            存放顶点的权重
+	 * @param node_kmer_count
+	 * @return
+	 */
 
 	public int compute_node_bv(int node_cov, Vector<Integer> node_kmer_count) {
 		if (node_kmer_count.size() == 1) {
@@ -2159,6 +3037,12 @@ return path_str;
 		}
 	}
 
+	/**
+	 * 对k-mer按照覆盖度进行排序
+	 * 
+	 * @param node_kmer
+	 * @return
+	 */
 	public List sort_kmer_asc(Map<Long, Integer> node_kmer) {
 
 		List list = new ArrayList<Map.Entry<Long, Integer>>(node_kmer.entrySet());
@@ -2172,15 +3056,28 @@ return path_str;
 		return list;
 	}
 
-	//Stack<Integer> stack = new Stack<Integer>();
+	// Stack<Integer> stack = new Stack<Integer>();
 
 	Vector<Integer> path = new Vector<Integer>();
 
-	public void dfs(int[][] edges, int src, int des, kmerHash kh,  int[][] f,
-			Vector<Vector<Integer>> path_sum) {
+	/**
+	 * 利用dfs寻找splicingGraph中的所有路径
+	 * 
+	 * @param edges
+	 *            是否存在边
+	 * @param src
+	 *            源点
+	 * @param des
+	 *            汇点
+	 * @param kh
+	 * @param f
+	 * @param path_sum
+	 *            存放splice graph中的所有路径
+	 */
+	public void dfs(int[][] edges, int src, int des, kmerHash kh, int[][] f, Vector<Vector<Integer>> path_sum) {
 		// TODO Auto-generated method stub
 		// bv是每个顶点最开始的fragment大小，现在要减去公共边的数量
-	//	stack.add(src);
+		// stack.add(src);
 		path.add(src);
 		if (src == des) {
 			Vector<Integer> path_c = new Vector<Integer>();
@@ -2198,49 +3095,62 @@ return path_str;
 		}
 	}
 
+	/**
+	 * 计算顶点权重
+	 * 
+	 * @param nodes
+	 *            顶点信息
+	 * @param kh
+	 * @param node_cov
+	 *            存放顶点权重
+	 * @return
+	 */
 	public Vector compute_node_cov(int[] nodes, kmerHash kh, int[] node_cov) {
 		Vector<Integer> node_kmer_count = new Vector<Integer>();
-		Vector<Vector<Integer>> node_kmer_set1=new Vector<Vector<Integer>>();
+		Vector<Vector<Integer>> node_kmer_set1 = new Vector<Vector<Integer>>();
 		for (int i = 0; i < nodes.length; i++) {
 			node_kmer_count.clear();
 			int length = node_set.get(nodes[i]).getSequence().length();
-			boolean flag=false;
+			boolean flag = false;
 			if (length < kh.kmer_length) {
 				int count = 0;
 				// 子节点
 				for (int j = 0; j < node_set.get(nodes[i]).getChildren().size(); j++) {
-					//System.out.println(node_set.get((int) node_set.get(nodes[i]).getChildren().get(j)).getSequence());
-					if(node_set.get((int) node_set.get(nodes[i]).getChildren().get(j)).getSequence().length()>=kh.kmer_length-length){
-					String kmer = node_set.get(nodes[i]).getSequence()
-							+ node_set.get((int) node_set.get(nodes[i]).getChildren().get(j)).getSequence().substring(0,
-									kh.kmer_length - length);
-					count += kh.kmer_map.get(baseOptions.kmerToIntval(kmer));
-					flag=true;
-					break;
+					// System.out.println(node_set.get((int)
+					// node_set.get(nodes[i]).getChildren().get(j)).getSequence());
+					if (node_set.get((int) node_set.get(nodes[i]).getChildren().get(j)).getSequence()
+							.length() >= kh.kmer_length - length) {
+						String kmer = node_set.get(nodes[i]).getSequence()
+								+ node_set.get((int) node_set.get(nodes[i]).getChildren().get(j)).getSequence()
+										.substring(0, kh.kmer_length - length);
+						count += kh.kmer_map.get(baseOptions.kmerToIntval(kmer));
+						flag = true;
+						break;
 					}
 				}
-				if(flag==false){
-				// 父节点
-				for (int j = 0; j < node_set.get(nodes[i]).getParents().size(); j++) {
-					if(node_set.get((int) node_set.get(nodes[i]).getParents().get(j)).getSequence().length()>=kh.kmer_length-length){
-					String kmer = node_set.get((int) node_set.get(nodes[i]).getParents().get(j)).getSequence()
-							.substring(node_set.get((int) node_set.get(nodes[i]).getParents().get(j)).getSequence()
-									.length() - (kh.kmer_length - length))
-							+ node_set.get(nodes[i]);
-					// TODO Auto-generated method stub 可修改
-					if (!kh.kmer_map.containsKey(baseOptions.kmerToIntval(kmer))) {
-						// System.out.println(kmer)
-						continue;
-					}
-					count += kh.kmer_map.get(baseOptions.kmerToIntval(kmer));
-					break;
+				if (flag == false) {
+					// 父节点
+					for (int j = 0; j < node_set.get(nodes[i]).getParents().size(); j++) {
+						if (node_set.get((int) node_set.get(nodes[i]).getParents().get(j)).getSequence()
+								.length() >= kh.kmer_length - length) {
+							String kmer = node_set.get((int) node_set.get(nodes[i]).getParents().get(j)).getSequence()
+									.substring(node_set.get((int) node_set.get(nodes[i]).getParents().get(j))
+											.getSequence().length() - (kh.kmer_length - length))
+									+ node_set.get(nodes[i]);
+							// TODO Auto-generated method stub 可修改
+							if (!kh.kmer_map.containsKey(baseOptions.kmerToIntval(kmer))) {
+								// System.out.println(kmer)
+								continue;
+							}
+							count += kh.kmer_map.get(baseOptions.kmerToIntval(kmer));
+							break;
+						}
 					}
 				}
-			}
 				node_cov[nodes[i]] = count;
 				node_kmer_count.add(count);
 				node_kmer_set1.add(node_kmer_count);
-				
+
 				// continue;
 			} else {
 				// System.out.println(node_set.get(i).getSequence());
@@ -2259,20 +3169,27 @@ return path_str;
 
 				}
 				// nodes[i] = node_cov;
-				Vector<Integer> node_kmer_count_c=new Vector<Integer>();
+				Vector<Integer> node_kmer_count_c = new Vector<Integer>();
 				node_kmer_count_c.addAll(node_kmer_count);
 				node_kmer_set1.add(node_kmer_count_c);
-			//	System.out.println("node_kmer_set:"+node_kmer_set);
+				// System.out.println("node_kmer_set:"+node_kmer_set);
 				node_cov[nodes[i]] = compute_node_bv(0, node_kmer_count);
-				
+
 			}
 		}
-		//System.out.println("size:"+node_kmer_set1.size());
+		// System.out.println("size:"+node_kmer_set1.size());
 		return node_kmer_set1;
 	}
-	
 
 	@SuppressWarnings("unchecked")
+	/**
+	 * 寻找splice graph中”最重的路径“
+	 * 
+	 * @param kh
+	 * @param path_sum
+	 *            所有的路径
+	 * @return
+	 */
 	public List find_the_highest_path(kmerHash kh, Vector<Vector<Integer>> path_sum) {
 		Map<Vector<Integer>, Float> path_cov = new HashMap<Vector<Integer>, Float>();
 		for (int i = 0; i < path_sum.size(); i++) {
@@ -2287,13 +3204,12 @@ return path_str;
 			int cov_sum = 0;
 			for (int j = 0; j <= path_with_node.length() - kh.kmer_length; j++) {
 				String kmer = path_with_node.substring(j, j + kh.kmer_length);
-				if(!kh.kmer_map.containsKey(baseOptions.kmerToIntval(kmer))){
-				cov_sum+=0;
-				}
-				else{
+				if (!kh.kmer_map.containsKey(baseOptions.kmerToIntval(kmer))) {
+					cov_sum += 0;
+				} else {
 					cov_sum += kh.kmer_map.get(baseOptions.kmerToIntval(kmer));
 				}
-				
+
 			}
 			float path_c = cov_sum / path_with_node.length();
 			path_cov.put(pa, path_c);
@@ -2308,49 +3224,62 @@ return path_str;
 		return list_path;
 	}
 
+	/**
+	 * 计算顶点的偏差因数
+	 * 
+	 * @param nodes
+	 *            顶点信息
+	 * @param kh
+	 * @param node_cov
+	 *            顶点权重
+	 * @return
+	 */
 	public Vector compute_node_bv(int[] nodes, kmerHash kh, int[] node_cov) {
 		Vector<Integer> node_kmer_count = new Vector<Integer>();
-		Vector<Vector<Integer>> node_kmer_set1=new Vector<Vector<Integer>>();
+		Vector<Vector<Integer>> node_kmer_set1 = new Vector<Vector<Integer>>();
 		for (int i = 0; i < nodes.length; i++) {
 			node_kmer_count.clear();
 			int length = node_set.get(nodes[i]).getSequence().length();
-			boolean flag=false;
+			boolean flag = false;
 			if (length < kh.kmer_length) {
 				int count = 0;
 				// 子节点
 				for (int j = 0; j < node_set.get(nodes[i]).getChildren().size(); j++) {
-					//System.out.println(node_set.get((int) node_set.get(nodes[i]).getChildren().get(j)).getSequence());
-					if(node_set.get((int) node_set.get(nodes[i]).getChildren().get(j)).getSequence().length()>=kh.kmer_length-length){
-					String kmer = node_set.get(nodes[i]).getSequence()
-							+ node_set.get((int) node_set.get(nodes[i]).getChildren().get(j)).getSequence().substring(0,
-									kh.kmer_length - length);
-					count += kh.kmer_map.get(baseOptions.kmerToIntval(kmer));
-					flag=true;
-					break;
+					// System.out.println(node_set.get((int)
+					// node_set.get(nodes[i]).getChildren().get(j)).getSequence());
+					if (node_set.get((int) node_set.get(nodes[i]).getChildren().get(j)).getSequence()
+							.length() >= kh.kmer_length - length) {
+						String kmer = node_set.get(nodes[i]).getSequence()
+								+ node_set.get((int) node_set.get(nodes[i]).getChildren().get(j)).getSequence()
+										.substring(0, kh.kmer_length - length);
+						count += kh.kmer_map.get(baseOptions.kmerToIntval(kmer));
+						flag = true;
+						break;
 					}
 				}
-				if(flag==false){
-				// 父节点
-				for (int j = 0; j < node_set.get(nodes[i]).getParents().size(); j++) {
-					if(node_set.get((int) node_set.get(nodes[i]).getParents().get(j)).getSequence().length()>=kh.kmer_length-length){
-					String kmer = node_set.get((int) node_set.get(nodes[i]).getParents().get(j)).getSequence()
-							.substring(node_set.get((int) node_set.get(nodes[i]).getParents().get(j)).getSequence()
-									.length() - (kh.kmer_length - length))
-							+ node_set.get(nodes[i]);
-					// TODO Auto-generated method stub 可修改
-					if (!kh.kmer_map.containsKey(baseOptions.kmerToIntval(kmer))) {
-						// System.out.println(kmer)
-						continue;
-					}
-					count += kh.kmer_map.get(baseOptions.kmerToIntval(kmer));
-					break;
+				if (flag == false) {
+					// 父节点
+					for (int j = 0; j < node_set.get(nodes[i]).getParents().size(); j++) {
+						if (node_set.get((int) node_set.get(nodes[i]).getParents().get(j)).getSequence()
+								.length() >= kh.kmer_length - length) {
+							String kmer = node_set.get((int) node_set.get(nodes[i]).getParents().get(j)).getSequence()
+									.substring(node_set.get((int) node_set.get(nodes[i]).getParents().get(j))
+											.getSequence().length() - (kh.kmer_length - length))
+									+ node_set.get(nodes[i]);
+							// TODO Auto-generated method stub 可修改
+							if (!kh.kmer_map.containsKey(baseOptions.kmerToIntval(kmer))) {
+								// System.out.println(kmer)
+								continue;
+							}
+							count += kh.kmer_map.get(baseOptions.kmerToIntval(kmer));
+							break;
+						}
 					}
 				}
-			}
 				node_cov[nodes[i]] = count;
 				node_kmer_count.add(count);
 				node_kmer_set1.add(node_kmer_count);
-				
+
 				// continue;
 			} else {
 				// System.out.println(node_set.get(i).getSequence());
@@ -2369,38 +3298,48 @@ return path_str;
 
 				}
 				// nodes[i] = node_cov;
-				Vector<Integer> node_kmer_count_c=new Vector<Integer>();
+				Vector<Integer> node_kmer_count_c = new Vector<Integer>();
 				node_kmer_count_c.addAll(node_kmer_count);
 				node_kmer_set1.add(node_kmer_count_c);
-			//	System.out.println("node_kmer_set:"+node_kmer_set);
+				// System.out.println("node_kmer_set:"+node_kmer_set);
 				node_cov[nodes[i]] = compute_node_bv(0, node_kmer_count);
-				
+
 			}
 		}
-		//System.out.println("size:"+node_kmer_set1.size());
+		// System.out.println("size:"+node_kmer_set1.size());
 		return node_kmer_set1;
 	}
-	
-	public String build_graph(Vector<Integer> path_highest, kmerHash kh, Map<Integer, Float> nodes_cov, int[] nodes,int[][] edges_ter,Vector<Vector<Integer>> node_kmer_set) {
-//		int size = path_highest.size();
-//		int[] nodes_begin = new int[size];
-//		for (int i = 0; i < size; i++) {
-//			nodes_begin[i] = path_highest.get(i);
-//		}
+/**
+ * 创建图
+ * @param path_highest
+ * @param kh
+ * @param nodes_cov
+ * @param nodes
+ * @param edges_ter
+ * @param node_kmer_set
+ * @return
+ */
+	public String build_graph(Vector<Integer> path_highest, kmerHash kh, Map<Integer, Float> nodes_cov, int[] nodes,
+			int[][] edges_ter, Vector<Vector<Integer>> node_kmer_set) {
+		// int size = path_highest.size();
+		// int[] nodes_begin = new int[size];
+		// for (int i = 0; i < size; i++) {
+		// nodes_begin[i] = path_highest.get(i);
+		// }
 		// 计算node_cov
-		//float[] node_cov = new float[node_set.size()];
-	//	compute_node_cov(nodes_begin, kh, node_cov);
-//		for (int j = 0; j < size; j++) {
-//			for (int i = 0; i < node_set.size(); i++) {
-//				if (i == nodes_begin[j]) {
-//					// System.out.print(i+":"+node_cov[i]+" ");
-//					nodes[i] = (int) node_cov[i];
-//				}
-//			}
-//		}
+		// float[] node_cov = new float[node_set.size()];
+		// compute_node_cov(nodes_begin, kh, node_cov);
+		// for (int j = 0; j < size; j++) {
+		// for (int i = 0; i < node_set.size(); i++) {
+		// if (i == nodes_begin[j]) {
+		// // System.out.print(i+":"+node_cov[i]+" ");
+		// nodes[i] = (int) node_cov[i];
+		// }
+		// }
+		// }
 		// 计算edge_cov
-	//	System.out.println(path_highest);
-	return	compute_fragment_count(path_highest, kh,edges_ter);
+		// System.out.println(path_highest);
+		return compute_fragment_count(path_highest, kh, edges_ter);
 		// System.out.println();
 	}
 
